@@ -4,3 +4,6 @@ const request = require('./request');
 const assert = chai.assert;
 
 
+describe('location API', () => {
+    
+})
