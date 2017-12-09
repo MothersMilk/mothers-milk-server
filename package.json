@@ -1,0 +1,35 @@
+{
+  "name": "mothers-milk-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm run mocha",
+    "mocha": "mocha --recursive",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MothersMilk/mothers-milk-server.git"
+  },
+  "author": "Shane Moyo <smoyo@pdx.edu>",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/MothersMilk/mothers-milk-server/issues"
+  },
+  "homepage": "https://github.com/MothersMilk/mothers-milk-server#readme",
+  "devDependencies": {
+    "bcryptjs": "^2.4.3",
+    "chai": "^4.1.2",
+    "chai-http": "^3.0.0",
+    "eslint": "^4.12.0",
+    "mocha": "^4.0.1"
+  },
+  "dependencies": {
+    "express": "^4.16.2",
+    "jsonwebtoken": "^8.1.0",
+    "mongoose": "^4.13.5",
+    "morgan": "^1.9.0",
+    "nodemon": "^1.12.1"
+  }
+}
