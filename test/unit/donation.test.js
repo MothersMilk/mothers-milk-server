@@ -1,5 +1,5 @@
 const assert = require('chai').assert; 
-const Donantion = require('../../lib/models/donation');
+const Donation = require('../../lib/models/donation');
 const request = require('../e2e/request');
 const mongoose = require('mongoose');
 
@@ -21,12 +21,12 @@ describe('Donation model', () =>  {
     });
 
     it('Should validate a good model', () => {
-        const Donantion = new Donation({
+        const donation = new Donation({
             quantity: 6,
-            location: location._id,
-            eta: '4:30PM'
+            eta: '4:30PM',
+            location: savedLocation._id,
         });
-        assert.equal(location.validateSync(), undefined);
+        assert.equal(donation.validateSync(), undefined);
     });
 
 })
