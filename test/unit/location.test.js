@@ -23,15 +23,14 @@ describe('Location model', () => {
 
     it('Should throw error for incorrect data types', () => {
         const location = new Location({
-            name: 9999,
-            address: 99999,
-            hours: 99999
+            name: {},
+            address: {},
+            hours: {}
         });
-        const errors = location.validateSync();
-        console.log('')
-        assert.equal(errors.name.kind, 'required');
-        assert.equal(errors.address.kind, 'required');
-        assert.equal(errors.hours.kind, 'required');
+        const { errors } = location.validateSync();
+        assert.equal(errors.name.kind, 'String');
+        assert.equal(errors.address.kind, 'String');
+        assert.equal(errors.hours.kind, 'String');
     });
 
 
