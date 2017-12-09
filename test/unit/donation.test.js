@@ -43,11 +43,9 @@ describe('Donation model', () =>  {
             eta: {},
             location: {}
         });
-        const { errors } = location.validateSync();
-        assert.equal(errors.quantity.kind, 'String');
+        const { errors } = donation.validateSync();
+        assert.equal(errors.quantity.kind, 'Number');
         assert.equal(errors.eta.kind, 'String');
-        assert.equal(errors.location.kind, 'String');
+        assert.equal(errors.location.kind, 'ObjectID');
     });
-
-
 })
