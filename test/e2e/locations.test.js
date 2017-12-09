@@ -53,10 +53,23 @@ describe('location API', () => {
                     assert.deepEqual(savedLocations, gotLocations);
                 })
         })   
+    });
 
-
-        
-    })
+    it('Should delete a location', () => {
+        return request.post('/api/locations')
+            .send(testLocations[1])
+            .then(savedLocation => {
+                const { body } = savedLocation;
+                return request.delete(`/api/locations/${savedLocation._id}`);
+            })
+            .then( ({ body }) => {
+                assert.deepEqual(body, { removed: true });
+                return request.get('/api/locations')
+                    .then( ({ body })=>{
+                        assert.deepEqual(body, []);
+                    })
+            });
+    });
 
 
 });
