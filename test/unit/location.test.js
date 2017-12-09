@@ -13,7 +13,13 @@ describe('Location model', () => {
         assert.equal(location.validateSync(), undefined);
     });
 
-   
+    it('Should throw error for missing fields', () => {
+        const location = new Location({});
+        const { errors } = location.validateSync();
+        assert.equal(errors.name.kind, 'required');
+        assert.equal(errors.address.kind, 'required');
+        assert.equal(error.hours.kind, 'required');
+    });
 
 
 })
