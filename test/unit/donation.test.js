@@ -37,4 +37,17 @@ describe('Donation model', () =>  {
         assert.equal(errors.location.kind, 'required');
     });
 
+    it('Should throw error for incorrect data types', () => {
+        const donation = new Donation({
+            quantity: {},
+            eta: {},
+            location: {}
+        });
+        const { errors } = location.validateSync();
+        assert.equal(errors.quantity.kind, 'String');
+        assert.equal(errors.eta.kind, 'String');
+        assert.equal(errors.location.kind, 'String');
+    });
+
+
 })
