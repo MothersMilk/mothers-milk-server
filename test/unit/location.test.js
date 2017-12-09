@@ -18,7 +18,7 @@ describe('Location model', () => {
         const { errors } = location.validateSync();
         assert.equal(errors.name.kind, 'required');
         assert.equal(errors.address.kind, 'required');
-        assert.equal(error.hours.kind, 'required');
+        assert.equal(errors.hours.kind, 'required');
     });
 
 
