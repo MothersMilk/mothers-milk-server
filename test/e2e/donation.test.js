@@ -69,5 +69,20 @@ describe('donation API', () => {
             });
     });
 
+    it('Should update a donation by id', () => {
+        const badDonation = testDonations[1];
+        let savedDonation = null; 
+        return request.post('/api/donations')
+            .send(badDonation)
+            .then(({ body }) => savedDonation = body)
+            .then(() => {
+                badDonation.eta = 'New  eta';
+                return request.put(`/api/donations/${savedDonation._id}`)
+                    .send(badDonation);
+            })
+            .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
+    });
+
+
     
 })
