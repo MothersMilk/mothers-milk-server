@@ -26,7 +26,15 @@ describe('location API', () => {
     ];
 
     it('Should save a location with an id', () => {
-        
+        return request.post('/api/locations')
+            .send(testLocations[1])
+            .then(({ body }) => {
+                const savedLocation = body;
+                assert.ok(savedLocation._id);
+                assert.equal(savedLocation.name, testLocations[1].name);
+                assert.equal(savedLocation.address, testLocations[1].address);
+                assert.equal(savedLocation.hours, testLocations[1].hours);
+            })
     })
 
 });
