@@ -29,4 +29,12 @@ describe('Donation model', () =>  {
         assert.equal(donation.validateSync(), undefined);
     });
 
+    it('Should throw error for missing fields', () => {
+        const donation = new Donation({});
+        const { errors } = donation.validateSync();
+        assert.equal(errors.quantity.kind, 'required');
+        assert.equal(errors.eta.kind, 'required');
+        assert.equal(errors.location.kind, 'required');
+    });
+
 })
