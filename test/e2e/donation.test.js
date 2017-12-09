@@ -56,5 +56,18 @@ describe('donation API', () => {
         })   
     });
 
+    it('Shoud get a donation by id', ()=>{
+        let donation;
+        return request.post('/api/donations')
+            .send(testDonations[1])
+            .then(res => donation = res.body )
+            .then(()=>{
+                return request.get(`/api/donations/${donation._id}`)
+                    .then(res =>{
+                        assert.deepEqual(res.body, donation);
+                    });
+            });
+    });
+
     
 })
