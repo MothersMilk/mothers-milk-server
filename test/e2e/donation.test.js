@@ -30,11 +30,11 @@ describe('donation API', () => {
         return request.post('/api/donations')
             .send(testDonations[1])
             .then(({ body }) => {
-                const saveDonation = body;
+                const savedDonation = body;
                 assert.ok(savedDonation._id);
-                assert.equal(savedDonation.quantity, testLocations[1].quantity);
-                assert.equal(savedDonation.eta, testLocations[1].eta);
-                assert.equal(savedDonation.location, testLocations[1].location);
+                assert.equal(savedDonation.quantity, testDonations[1].quantity);
+                assert.equal(savedDonation.eta, testDonations[1].eta);
+                assert.equal(savedDonation.location, testDonations[1].location);
             });
     });
 
