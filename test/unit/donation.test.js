@@ -22,7 +22,7 @@ describe('Donation model', () =>  {
 
     it('Should validate a good model', () => {
         const Donantion = new Donation({
-            amount: 6,
+            quantity: 6,
             location: location._id,
             eta: '4:30PM'
         });
