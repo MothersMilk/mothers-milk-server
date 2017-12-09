@@ -34,7 +34,29 @@ describe('location API', () => {
                 assert.equal(savedLocation.name, testLocations[1].name);
                 assert.equal(savedLocation.address, testLocations[1].address);
                 assert.equal(savedLocation.hours, testLocations[1].hours);
-            })
+            });
+    });
+
+    it('Should get all saved loactions', () => {
+        const saveLoactions = testLocations.map( location => {
+            return request.post('/api/locations')
+                .send(location)
+                .then(({ body }) => body );
+        });
+
+        return Promise.all(saveLoactions)
+        .then(savedLocations => {
+            return request.get('/api/locations')
+                .then(({ body }) => {
+                    const gotLocations = body.sort((a, b) => a._id < b._id);
+                    savedLocations = savedLocations.sort((a, b) => a._id < b._id);
+                    assert.deepEqual(savedLocations, gotLocations);
+                })
+        })   
+
+
+        
     })
+
 
 });
