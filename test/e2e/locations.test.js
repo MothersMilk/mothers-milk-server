@@ -58,8 +58,8 @@ describe('location API', () => {
     it('Should delete a location', () => {
         return request.post('/api/locations')
             .send(testLocations[1])
-            .then(savedLocation => {
-                const { body } = savedLocation;
+            .then(({ body }) => {
+                const savedLocation = body;
                 return request.delete(`/api/locations/${savedLocation._id}`);
             })
             .then( ({ body }) => {
