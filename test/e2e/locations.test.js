@@ -71,6 +71,19 @@ describe('location API', () => {
             });
     });
 
+    it('Shoud get a location by id', ()=>{
+        let location;
+        return request.post('/api/locations')
+            .send(testLocations[1])
+            .then(res => location = res.body )
+            .then(()=>{
+                return request.get(`/api/locations/${location._id}`)
+                    .then(res =>{
+                        assert.deepEqual(res.body, location);
+                    });
+            });
+    });
+
     it('Should update a location by id', () => {
         const badLocation = testLocations[1];
         let savedLocation = null; 
