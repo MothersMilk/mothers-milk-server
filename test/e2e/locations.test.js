@@ -71,5 +71,19 @@ describe('location API', () => {
             });
     });
 
+    it('Should update a location by id', () => {
+        const badLocation = testLocations[1];
+        let savedLocation = null; 
+        return request.post('/api/locations')
+            .send(badLocation)
+            .then(({ body }) => savedLocation = body)
+            .then(() => {
+                badLocation.address = 'New address';
+                return request.put(`/api/locations/${savedLocation._id}`)
+                    .send(badLocation);
+            })
+            .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
+    });
+
 
 });
