@@ -38,5 +38,23 @@ describe('donation API', () => {
             });
     });
 
+    it('Should get all saved donations', () => {
+        const saveDonations = testDonations.map( donation => {
+            return request.post('/api/donations')
+                .send(donation)
+                .then(({ body }) => body );
+        });
+
+        return Promise.all(saveDonations)
+        .then(savedDonations => {
+            return request.get('/api/donations')
+                .then(({ body }) => {
+                    const gotDonations = body.sort((a, b) => a._id < b._id);
+                    savedDonations = savedDonations.sort((a, b) => a._id < b._id);
+                    assert.deepEqual(savedDonations, gotDonations);
+                })
+        })   
+    });
+
     
 })

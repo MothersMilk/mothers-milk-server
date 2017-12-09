@@ -37,14 +37,14 @@ describe('location API', () => {
             });
     });
 
-    it('Should get all saved loactions', () => {
-        const saveLoactions = testLocations.map( location => {
+    it('Should get all saved locations', () => {
+        const saveLocations = testLocations.map( location => {
             return request.post('/api/locations')
                 .send(location)
                 .then(({ body }) => body );
         });
 
-        return Promise.all(saveLoactions)
+        return Promise.all(saveLocations)
         .then(savedLocations => {
             return request.get('/api/locations')
                 .then(({ body }) => {
