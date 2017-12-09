@@ -83,6 +83,22 @@ describe('donation API', () => {
             .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
     });
 
+    it('Should delete a donation', () => {
+        return request.post('/api/donations')
+            .send(testDonations[1])
+            .then(({ body }) => {
+                const savedDonation = body;
+                return request.delete(`/api/donations/${savedDonation._id}`);
+            })
+            .then( ({ body }) => {
+                assert.deepEqual(body, { removed: true });
+                return request.get('/api/donations')
+                    .then( ({ body })=>{
+                        assert.deepEqual(body, []);
+                    })
+            });
+    });
+
 
     
 })
