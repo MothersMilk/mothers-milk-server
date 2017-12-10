@@ -4,6 +4,7 @@ const request = require('./request');
 const assert = chai.assert;
 
 describe('staff API', () => {
+
     beforeEach(() => mongoose.connection.dropDatabase());
 
     const testStaff = {
@@ -17,6 +18,7 @@ describe('staff API', () => {
             .send(testStaff)
             .then(res => {
                 const staff = res.body;
+                console.log('in e2e test', res.body);
                 assert.ok(staff._id);
                 assert.equal(staff.name, testStaff.name);
             });
