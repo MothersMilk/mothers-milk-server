@@ -24,7 +24,7 @@ describe('donation API', () => {
         testDonations.push({quantity: 6, eta: '4:30PM', location: savedLocation._id});
         testDonations.push({quantity: 9, eta: '6:30PM', location: savedLocation._id});
         testDonations.push({quantity: 3, eta: '9:30PM', location: savedLocation._id});
-    })
+    });
 
     it('Should save a donation with an id', () => {
         return request.post('/api/donations')
@@ -56,7 +56,7 @@ describe('donation API', () => {
         })   
     });
 
-    it('Shoud get a donation by id', ()=>{
+    it('Should get a donation by id', ()=>{
         let donation;
         return request.post('/api/donations')
             .send(testDonations[1])
@@ -95,10 +95,7 @@ describe('donation API', () => {
                 return request.get('/api/donations')
                     .then( ({ body })=>{
                         assert.deepEqual(body, []);
-                    })
+                    });
             });
     });
-
-
-    
-})
+});
