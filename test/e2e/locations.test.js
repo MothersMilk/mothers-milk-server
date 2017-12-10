@@ -51,8 +51,8 @@ describe('location API', () => {
                     const gotLocations = body.sort((a, b) => a._id < b._id);
                     savedLocations = savedLocations.sort((a, b) => a._id < b._id);
                     assert.deepEqual(savedLocations, gotLocations);
-                })
-        })   
+                });
+        });   
     });
 
     it('Should delete a location', () => {
@@ -67,7 +67,7 @@ describe('location API', () => {
                 return request.get('/api/locations')
                     .then( ({ body })=>{
                         assert.deepEqual(body, []);
-                    })
+                    });
             });
     });
 
@@ -97,6 +97,4 @@ describe('location API', () => {
             })
             .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
     });
-
-
 });
