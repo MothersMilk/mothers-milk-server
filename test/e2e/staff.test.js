@@ -13,7 +13,6 @@ describe('staff API', () => {
     };
 
     it('saves with id', () => {
-
         return request.post('/api/staff')
             .send(testStaff)
             .then(res => {
@@ -22,5 +21,27 @@ describe('staff API', () => {
                 assert.ok(staff._id);
                 assert.equal(staff.name, testStaff.name);
             });
+    });
+
+    it.only('removes by id', () => {
+        let staff = null;
+        return request.post('/api/staff')
+            .send(testStaff)
+            .then(res => {
+                staff = res.body;
+                console.log('res.body', res.body);
+                return request.delete(`/api/staff/${staff._id}`);
+            })
+            .then(res => {
+                console.log('second res.body', res.body);
+                assert.deepEqual(res.body, { removed: true });
+                return request.get(`/api/staff/${staff._id}`);
+            })
+            .then(
+                () => { throw new Error('Unexpected successful response'); },
+                err => {
+                    assert.equal(err.status, 404);
+                }
+            );
     });
 });
