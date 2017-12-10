@@ -55,7 +55,7 @@ describe('location API', () => {
         });   
     });
 
-    it.only('Should delete a location', () => {
+    it('Should delete a location', () => {
         return request.post('/api/locations')
             .send(testLocations[1])
             .then(({ body }) => {
@@ -71,7 +71,7 @@ describe('location API', () => {
             });
     });
 
-    it('Shoud get a location by id', ()=>{
+    it('Should get a location by id', ()=>{
         let location;
         return request.post('/api/locations')
             .send(testLocations[1])
