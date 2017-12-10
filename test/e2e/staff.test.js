@@ -55,7 +55,7 @@ describe('staff API', () => {
             });
     });
 
-    it.only('gets all staff', () => {
+    it('gets all staff', () => {
         const otherStaff = {
             name: 'Tina',
             hash: '345'
@@ -76,5 +76,22 @@ describe('staff API', () => {
             .then(res => {
                 assert.deepEqual(res.body, saved);
             });
+    });
+
+    it('updates the staff by id', () => {
+        let changeStaff = {
+            name: 'Michelle',
+            hash: '123'
+        };
+        let savedStaff = null;
+
+        return request.post('/api/staff')
+            .send(testStaff)
+            .then(({ body }) => savedStaff = body)
+            .then(() => {
+                return request.put(`/api/staff/${savedStaff._id}`)
+                    .send(changeStaff);
+            })
+            .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
     });
 });
