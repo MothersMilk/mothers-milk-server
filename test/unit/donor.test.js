@@ -15,6 +15,7 @@ describe('Donation model', () =>  {
         email: 'janedoe@milk.com',
         password: '123'
     };
+
     
     beforeEach(()=> {
         mongoose.connection.dropDatabase();
