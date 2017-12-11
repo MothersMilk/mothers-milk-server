@@ -12,6 +12,7 @@ describe('Donation model', () =>  {
         address: '417 SW 117th Ave, Portland, OR 97225',
         hours: '8AM–4:30PM'
     };
+    let savedDonor = null;
 
 
     beforeEach(() => mongoose.connection.dropDatabase());
@@ -33,11 +34,22 @@ describe('Donation model', () =>  {
             });
     });
 
+    beforeEach(() => {
+        return request.post('/api/users')
+            .send({
+                email: 'test2@gmail.com',
+                name: 'Mich',
+                hash: '235'
+            })
+            .then(({ body }) => savedDonor = body);
+    });
+
     it('Should validate a good model', () => {
         const donation = new Donation({
             quantity: 6,
             date: '1970-01-01',
             dropSite: savedDropSite._id,
+            Donor: savedDonor._id
         });
         assert.equal(donation.validateSync(), undefined);
     });
