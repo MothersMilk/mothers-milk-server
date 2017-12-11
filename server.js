@@ -5,7 +5,7 @@ const connect = require('./lib/connect');
 connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mothersmilk');
 
 const server = http.createServer(app);
-const port = process.env.port || 3000;
+const port = process.env.PORT || 3000;
 
 server.listen(port, () => {
     console.log('server running on', server.address().port);
