@@ -19,11 +19,11 @@ describe('User model', () => {
     });
 
     it('Should throw errors for incorrect data types', () => {
-        const staff = new Staff({
+        const user = new User({
             name: {},
             hash: {}
         });
-        const { errors } = staff.validateSync();
+        const { errors } = user.validateSync();
         assert.equal(errors.name.kind, 'String');
         assert.equal(errors.hash.kind, 'String');
     });
