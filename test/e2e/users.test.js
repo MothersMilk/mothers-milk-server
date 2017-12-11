@@ -14,6 +14,13 @@ describe('user API', () => {
         roles: ['admin'],
         password: '2'
     };
+    const testUser2 = {
+        name: 'Michele',
+        hash: '123',
+        email: '111@222.com',
+        roles: ['admin'],
+        password: '2'
+    };
     let anotherTestUser = '';
     let token = '';
 
@@ -29,9 +36,9 @@ describe('user API', () => {
     it('saves with id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser)
+            .send(testUser2)
             .then(res => {
-                const user = res.body;
+                const user = res.body.newUser;
                 assert.ok(user._id);
                 assert.equal(user.name, testUser.name);
             });
@@ -41,9 +48,9 @@ describe('user API', () => {
         let user = null;
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser)
+            .send(testUser2)
             .then(res => {
-                user = res.body;
+                user = res.body.newUser;
                 return request.delete(`/api/users/${user._id}`)
                     .set('Authorization', token);
             })
@@ -64,9 +71,9 @@ describe('user API', () => {
         let user = null;
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser)
+            .send(testUser2)
             .then(res => {
-                user = res.body;
+                user = res.body.newUser;
                 return request.get(`/api/users/${user._id}`)
                     .set('Authorization', token);
             })
@@ -79,12 +86,12 @@ describe('user API', () => {
         const otheruser = {
             name: 'Not Michele',
             hash: '123',
-            email: '123@123.com',
+            email: '1222223@123.com',
             roles: ['admin'],
             password: '2'
         };
         
-        const posts = [testUser, otheruser].map(user => {
+        const posts = [testUser2, otheruser].map(user => {
             return request.post('/api/users')
                 .set('Authorization', token)
                 .send(user)
@@ -113,8 +120,8 @@ describe('user API', () => {
 
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser)
-            .then(({ body }) => saveduser = body)
+            .send(testUser2)
+            .then(({ body }) => saveduser = body.newUser)
             .then(() => {
                 return request.put(`/api/users/${saveduser._id}`)
                     .set('Authorization', token)
