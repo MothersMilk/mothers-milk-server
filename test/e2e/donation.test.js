@@ -5,6 +5,17 @@ const assert = chai.assert;
 
 describe('donation API', () => {
     beforeEach(() => mongoose.connection.dropDatabase());
+    let token = '';
+    beforeEach(() => {
+        return request
+            .post('/api/auth/signup')
+            .send({
+                email: 'teststaff@test.com',
+                name: 'Test staff',
+                password: 'password' 
+            })
+            .then(({ body }) => token = body.token);
+    });
 
     let savedLocation = null;
     const testDonations = [];
@@ -26,8 +37,9 @@ describe('donation API', () => {
         testDonations.push({quantity: 3, eta: '9:30PM', location: savedLocation._id});
     });
 
-    it('Should save a donation with an id', () => {
+    it.only('Should save a donation with an id', () => {
         return request.post('/api/donations')
+            .set('Authorization', token)
             .send(testDonations[1])
             .then(({ body }) => {
                 const savedDonation = body;
