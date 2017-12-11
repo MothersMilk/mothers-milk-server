@@ -27,6 +27,7 @@ describe('donation API', () => {
 
     beforeEach(() => {
         return request.post('/api/locations')
+            .set('Authorization', token)
             .send(location)
             .then(({ body }) => savedLocation = body);
     });
