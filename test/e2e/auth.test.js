@@ -42,7 +42,11 @@ describe('Auth API', () => {
     it('Should throw an error if password is not included', () => {
         return request
             .post('/api/auth/signup')
-            .send({ email: 'otheruser', password: '' })
+            .send({ 
+                email: 'teststaff@test.com',
+                name: 'Test staff',
+                password: '' 
+            })
             .then(
                 () => { throw new Error('Unexpected successful response'); },
                 err => {
