@@ -55,7 +55,7 @@ describe('Auth API', () => {
             );       
     });
 
-    it('Signin with same credential', () => {
+    it('Should signin with valid credentials', () => {
         return request
             .post('/api/auth/signin')
             .send({ 
