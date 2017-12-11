@@ -5,6 +5,17 @@ const assert = chai.assert;
 
 describe('donation API', () => {
     beforeEach(() => mongoose.connection.dropDatabase());
+    let token = '';
+    beforeEach(() => {
+        return request
+            .post('/api/auth/signup')
+            .send({
+                email: 'teststaff@test.com',
+                name: 'Test staff',
+                password: 'password' 
+            })
+            .then(({ body }) => token = body.token);
+    });
 
     let savedDropSite = null;
     const testDonations = [];
@@ -15,7 +26,9 @@ describe('donation API', () => {
     };
 
     beforeEach(() => {
+
         return request.post('/api/dropSites')
+            .set('Authorization', token)
             .send(dropSite)
             .then(({ body }) => savedDropSite = body);
     });
@@ -28,6 +41,7 @@ describe('donation API', () => {
 
     it('Should save a donation with an id', () => {
         return request.post('/api/donations')
+            .set('Authorization', token)
             .send(testDonations[1])
             .then(({ body }) => {
                 const savedDonation = body;
@@ -41,28 +55,32 @@ describe('donation API', () => {
     it('Should get all saved donations', () => {
         const saveDonations = testDonations.map( donation => {
             return request.post('/api/donations')
+                .set('Authorization', token)
                 .send(donation)
                 .then(({ body }) => body );
         });
 
         return Promise.all(saveDonations)
-        .then(savedDonations => {
-            return request.get('/api/donations')
-                .then(({ body }) => {
-                    const gotDonations = body.sort((a, b) => a._id < b._id);
-                    savedDonations = savedDonations.sort((a, b) => a._id < b._id);
-                    assert.deepEqual(savedDonations, gotDonations);
-                })
-        })   
+            .then(savedDonations => {
+                return request.get('/api/donations')
+                    .set('Authorization', token)
+                    .then(({ body }) => {
+                        const gotDonations = body.sort((a, b) => a._id < b._id);
+                        savedDonations = savedDonations.sort((a, b) => a._id < b._id);
+                        assert.deepEqual(savedDonations, gotDonations);
+                    });
+            });   
     });
 
     it('Should get a donation by id', ()=>{
         let donation;
         return request.post('/api/donations')
+            .set('Authorization', token)
             .send(testDonations[1])
             .then(res => donation = res.body )
             .then(()=>{
                 return request.get(`/api/donations/${donation._id}`)
+                    .set('Authorization', token)
                     .then(res =>{
                         assert.deepEqual(res.body, donation);
                     });
@@ -73,11 +91,13 @@ describe('donation API', () => {
         const badDonation = testDonations[1];
         let savedDonation = null; 
         return request.post('/api/donations')
+            .set('Authorization', token)
             .send(badDonation)
             .then(({ body }) => savedDonation = body)
             .then(() => {
                 badDonation.eta = 'New  eta';
                 return request.put(`/api/donations/${savedDonation._id}`)
+                    .set('Authorization', token)
                     .send(badDonation);
             })
             .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
@@ -85,14 +105,18 @@ describe('donation API', () => {
 
     it('Should delete a donation', () => {
         return request.post('/api/donations')
+            .set('Authorization', token)
             .send(testDonations[1])
             .then(({ body }) => {
                 const savedDonation = body;
-                return request.delete(`/api/donations/${savedDonation._id}`);
+                return request.delete(`/api/donations/${savedDonation._id}`)
+                    .set('Authorization', token);
+                
             })
             .then( ({ body }) => {
                 assert.deepEqual(body, { removed: true });
                 return request.get('/api/donations')
+                    .set('Authorization', token)
                     .then( ({ body })=>{
                         assert.deepEqual(body, []);
                     });
