@@ -7,6 +7,18 @@ const assert = chai.assert;
 describe('location API', () => {
     beforeEach(() => mongoose.connection.dropDatabase());
 
+    let token = '';
+    beforeEach(() => {
+        return request
+            .post('/api/auth/signup')
+            .send({
+                email: 'teststaff@test.com',
+                name: 'Test staff',
+                password: 'password' 
+            })
+            .then(({ body }) => token = body.token);
+    });
+
     const testLocations = [
         {
             name: 'Milk Bank 1',
@@ -27,6 +39,7 @@ describe('location API', () => {
 
     it('Should save a location with an id', () => {
         return request.post('/api/locations')
+            .set('Authorization', token)
             .send(testLocations[1])
             .then(({ body }) => {
                 const savedLocation = body;
@@ -40,31 +53,36 @@ describe('location API', () => {
     it('Should get all saved locations', () => {
         const saveLocations = testLocations.map( location => {
             return request.post('/api/locations')
+                .set('Authorization', token)
                 .send(location)
                 .then(({ body }) => body );
         });
 
         return Promise.all(saveLocations)
-        .then(savedLocations => {
-            return request.get('/api/locations')
-                .then(({ body }) => {
-                    const gotLocations = body.sort((a, b) => a._id < b._id);
-                    savedLocations = savedLocations.sort((a, b) => a._id < b._id);
-                    assert.deepEqual(savedLocations, gotLocations);
-                });
-        });   
+            .then(savedLocations => {
+                return request.get('/api/locations')
+                    .set('Authorization', token)
+                    .then(({ body }) => {
+                        const gotLocations = body.sort((a, b) => a._id < b._id);
+                        savedLocations = savedLocations.sort((a, b) => a._id < b._id);
+                        assert.deepEqual(savedLocations, gotLocations);
+                    });
+            });   
     });
 
     it('Should delete a location', () => {
         return request.post('/api/locations')
+            .set('Authorization', token)
             .send(testLocations[1])
             .then(({ body }) => {
                 const savedLocation = body;
-                return request.delete(`/api/locations/${savedLocation._id}`);
+                return request.delete(`/api/locations/${savedLocation._id}`)
+                    .set('Authorization', token);
             })
             .then( ({ body }) => {
                 assert.deepEqual(body, { removed: true });
                 return request.get('/api/locations')
+                    .set('Authorization', token)
                     .then( ({ body })=>{
                         assert.deepEqual(body, []);
                     });
@@ -74,10 +92,12 @@ describe('location API', () => {
     it('Should get a location by id', ()=>{
         let location;
         return request.post('/api/locations')
+            .set('Authorization', token)
             .send(testLocations[1])
             .then(res => location = res.body )
             .then(()=>{
                 return request.get(`/api/locations/${location._id}`)
+                    .set('Authorization', token)
                     .then(res =>{
                         assert.deepEqual(res.body, location);
                     });
@@ -88,11 +108,13 @@ describe('location API', () => {
         const badLocation = testLocations[1];
         let savedLocation = null; 
         return request.post('/api/locations')
+            .set('Authorization', token)
             .send(badLocation)
             .then(({ body }) => savedLocation = body)
             .then(() => {
                 badLocation.address = 'New address';
                 return request.put(`/api/locations/${savedLocation._id}`)
+                    .set('Authorization', token)
                     .send(badLocation);
             })
             .then(({ body }) => assert.deepEqual(body.nModified === 1, true));

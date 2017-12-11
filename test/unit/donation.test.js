@@ -13,11 +13,23 @@ describe('Donation model', () =>  {
         hours: '8AM–4:30PM'
     };
 
-    beforeEach(()=> {
-        mongoose.connection.dropDatabase();
-        return request.post('/api/locations')
-            .send(location)
-            .then(({ body }) => savedLocation = body);
+    beforeEach(() => mongoose.connection.dropDatabase());
+    let token = '';
+    beforeEach(() => {
+        return request
+            .post('/api/auth/signup')
+            .send({
+                email: 'teststaff@test.com',
+                name: 'Test staff',
+                password: 'password' 
+            })
+            .then(({ body }) => token = body.token)
+            .then(() => {
+                return request.post('/api/locations')
+                    .set('Authorization', token)
+                    .send(location)
+                    .then(({ body }) => savedLocation = body);
+            });
     });
 
     it('Should validate a good model', () => {
@@ -48,4 +60,4 @@ describe('Donation model', () =>  {
         assert.equal(errors.eta.kind, 'String');
         assert.equal(errors.location.kind, 'ObjectID');
     });
-})
+});
