@@ -1,7 +1,7 @@
 const request = require('./request');
 const assert = require('chai').assert;
 const mongoose = require('mongoose');
-const db = require('./db');
+
 
 describe('Auth API', () => {
 
@@ -12,7 +12,13 @@ describe('Auth API', () => {
         return request
             .post('/api/auth/signup')
             .send({
-                
+                email: 'teststaff@test.com',
+                name: 'Test staff',
             })
-    })
+            .then(({ body }) => token = body.token);
+    });
+
+    it('signup', () => {
+        assert.ok(token);
+    });
 })
