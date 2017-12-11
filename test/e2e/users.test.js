@@ -3,36 +3,36 @@ const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
 
-describe('staff API', () => {
+describe('user API', () => {
 
     beforeEach(() => mongoose.connection.dropDatabase());
 
-    const testStaff = {
+    const testUser = {
         name: 'Michele',
         hash: '123'
     };
 
     it('saves with id', () => {
-        return request.post('/api/staff')
-            .send(testStaff)
+        return request.post('/api/users')
+            .send(testUser)
             .then(res => {
-                const staff = res.body;
-                assert.ok(staff._id);
-                assert.equal(staff.name, testStaff.name);
+                const user = res.body;
+                assert.ok(user._id);
+                assert.equal(user.name, testUser.name);
             });
     });
 
     it('removes by id', () => {
-        let staff = null;
-        return request.post('/api/staff')
-            .send(testStaff)
+        let user = null;
+        return request.post('/api/users')
+            .send(testUser)
             .then(res => {
-                staff = res.body;
-                return request.delete(`/api/staff/${staff._id}`);
+                user = res.body;
+                return request.delete(`/api/users/${user._id}`);
             })
             .then(res => {
                 assert.deepEqual(res.body, { removed: true });
-                return request.get(`/api/staff/${staff._id}`);
+                return request.get(`/api/users/${user._id}`);
             })
             .then(
                 () => { throw new Error('Unexpected successful response'); },
@@ -43,27 +43,27 @@ describe('staff API', () => {
     });
 
     it('get by id', () => {
-        let staff = null;
-        return request.post('/api/staff')
-            .send(testStaff)
+        let user = null;
+        return request.post('/api/users')
+            .send(testUser)
             .then(res => {
-                staff = res.body;
-                return request.get(`/api/staff/${staff._id}`);
+                user = res.body;
+                return request.get(`/api/users/${user._id}`);
             })
             .then(res => {
-                assert.deepEqual(res.body, staff);
+                assert.deepEqual(res.body, user);
             });
     });
 
-    it('gets all staff', () => {
-        const otherStaff = {
+    it('gets all user', () => {
+        const otheruser = {
             name: 'Tina',
             hash: '345'
         };
         
-        const posts = [testStaff, otherStaff].map(staff => {
-            return request.post('/api/staff')
-                .send(staff)
+        const posts = [testUser, otheruser].map(user => {
+            return request.post('/api/users')
+                .send(user)
                 .then(res => res.body);
         });
 
@@ -71,26 +71,26 @@ describe('staff API', () => {
         return Promise.all(posts)
             .then(_saved => {
                 saved = _saved;
-                return request.get('/api/staff');
+                return request.get('/api/users');
             })
             .then(res => {
                 assert.deepEqual(res.body, saved);
             });
     });
 
-    it('updates the staff by id', () => {
-        let changeStaff = {
+    it('updates the user by id', () => {
+        let changeuser = {
             name: 'Michelle',
             hash: '123'
         };
-        let savedStaff = null;
+        let saveduser = null;
 
-        return request.post('/api/staff')
-            .send(testStaff)
-            .then(({ body }) => savedStaff = body)
+        return request.post('/api/users')
+            .send(testUser)
+            .then(({ body }) => saveduser = body)
             .then(() => {
-                return request.put(`/api/staff/${savedStaff._id}`)
-                    .send(changeStaff);
+                return request.put(`/api/users/${saveduser._id}`)
+                    .send(changeuser);
             })
             .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
     });
