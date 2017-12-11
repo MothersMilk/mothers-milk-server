@@ -38,4 +38,16 @@ describe('Auth API', () => {
                 }
             );
     });
+
+    it('Should throw an error if password is not included', () => {
+        return request
+            .post('/api/auth/signup')
+            .send({ email: 'otheruser', password: '' })
+            .then(
+                () => { throw new Error('Unexpected successful response'); },
+                err => {
+                    assert.equal(err.status, 400);
+                }
+            );       
+});
 });
