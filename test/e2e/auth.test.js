@@ -53,5 +53,19 @@ describe('Auth API', () => {
                     assert.equal(err.status, 400);
                 }
             );       
-});
+    });
+
+    it('Signin with same credential', () => {
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'teststaff@test.com',
+                name: 'Test staff',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                assert.isOk(body.token);
+            });          
+    });
+
 });
