@@ -14,6 +14,7 @@ describe('Auth API', () => {
             .send({
                 email: 'teststaff@test.com',
                 name: 'Test staff',
+                password: 'password'
             })
             .then(({ body }) => token = body.token);
     });
