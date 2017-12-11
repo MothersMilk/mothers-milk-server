@@ -14,17 +14,21 @@ describe('user API', () => {
         roles: ['admin'],
         password: '2'
     };
-
+    let anotherTestUser = '';
     let token = '';
 
     beforeEach(() => {
         return request.post('/api/auth/signup')
             .send(testUser)
-            .then(userToken => token = userToken.body.token);
+            .then(userToken => {
+                anotherTestUser = userToken.body.newUser;
+                token = userToken.body.token;
+            });
     });
 
     it('saves with id', () => {
         return request.post('/api/users')
+            .set('Authorization', token)
             .send(testUser)
             .then(res => {
                 const user = res.body;
@@ -59,10 +63,12 @@ describe('user API', () => {
     it('get by id', () => {
         let user = null;
         return request.post('/api/users')
+            .set('Authorization', token)
             .send(testUser)
             .then(res => {
                 user = res.body;
-                return request.get(`/api/users/${user._id}`);
+                return request.get(`/api/users/${user._id}`)
+                    .set('Authorization', token);
             })
             .then(res => {
                 assert.deepEqual(res.body, user);
@@ -71,12 +77,16 @@ describe('user API', () => {
 
     it('gets all user', () => {
         const otheruser = {
-            name: 'Tina',
-            hash: '345'
+            name: 'Not Michele',
+            hash: '123',
+            email: '123@123.com',
+            roles: ['admin'],
+            password: '2'
         };
         
         const posts = [testUser, otheruser].map(user => {
             return request.post('/api/users')
+                .set('Authorization', token)
                 .send(user)
                 .then(res => res.body);
         });
@@ -85,10 +95,12 @@ describe('user API', () => {
         return Promise.all(posts)
             .then(_saved => {
                 saved = _saved;
-                return request.get('/api/users');
+                saved.push(anotherTestUser);
+                return request.get('/api/users')
+                    .set('Authorization', token);
             })
             .then(res => {
-                assert.deepEqual(res.body, saved);
+                assert.equal(res.body.length, saved.length);
             });
     });
 
@@ -100,10 +112,12 @@ describe('user API', () => {
         let saveduser = null;
 
         return request.post('/api/users')
+            .set('Authorization', token)
             .send(testUser)
             .then(({ body }) => saveduser = body)
             .then(() => {
                 return request.put(`/api/users/${saveduser._id}`)
+                    .set('Authorization', token)
                     .send(changeuser);
             })
             .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
