@@ -9,8 +9,19 @@ describe('user API', () => {
 
     const testUser = {
         name: 'Michele',
-        hash: '123'
+        hash: '123',
+        email: '123@123.com',
+        roles: ['admin'],
+        password: '2'
     };
+
+    let token = '';
+
+    beforeEach(() => {
+        return request.post('/api/auth/signup')
+            .send(testUser)
+            .then(userToken => token = userToken.body.token);
+    });
 
     it('saves with id', () => {
         return request.post('/api/users')
@@ -25,14 +36,17 @@ describe('user API', () => {
     it('removes by id', () => {
         let user = null;
         return request.post('/api/users')
+            .set('Authorization', token)
             .send(testUser)
             .then(res => {
                 user = res.body;
-                return request.delete(`/api/users/${user._id}`);
+                return request.delete(`/api/users/${user._id}`)
+                    .set('Authorization', token);
             })
             .then(res => {
                 assert.deepEqual(res.body, { removed: true });
-                return request.get(`/api/users/${user._id}`);
+                return request.get(`/api/users/${user._id}`)
+                    .set('Authorization', token);
             })
             .then(
                 () => { throw new Error('Unexpected successful response'); },
