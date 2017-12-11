@@ -6,12 +6,13 @@ const mongoose = require('mongoose');
 describe('Donation model', () =>  {
 
     //todo: save a donor before each test and add ref to test schema
-    let savedLocation = null;
-    const location = {
+    let savedDropSite = null;
+    const dropSite = {
         name: 'Northwest Mothers Milk Bank',
         address: '417 SW 117th Ave, Portland, OR 97225',
         hours: '8AM–4:30PM'
     };
+
 
     beforeEach(() => mongoose.connection.dropDatabase());
     let token = '';
@@ -25,10 +26,10 @@ describe('Donation model', () =>  {
             })
             .then(({ body }) => token = body.token)
             .then(() => {
-                return request.post('/api/locations')
+                return request.post('/api/dropSites')
                     .set('Authorization', token)
-                    .send(location)
-                    .then(({ body }) => savedLocation = body);
+                    .send(dropSite)
+                    .then(({ body }) => savedDropSite = body);
             });
     });
 
@@ -36,7 +37,7 @@ describe('Donation model', () =>  {
         const donation = new Donation({
             quantity: 6,
             eta: '4:30PM',
-            location: savedLocation._id,
+            dropSite: savedDropSite._id,
         });
         assert.equal(donation.validateSync(), undefined);
     });
@@ -46,18 +47,18 @@ describe('Donation model', () =>  {
         const { errors } = donation.validateSync();
         assert.equal(errors.quantity.kind, 'required');
         assert.equal(errors.eta.kind, 'required');
-        assert.equal(errors.location.kind, 'required');
+        assert.equal(errors.dropSite.kind, 'required');
     });
 
     it('Should throw error for incorrect data types', () => {
         const donation = new Donation({
             quantity: {},
             eta: {},
-            location: {}
+            dropSite: {}
         });
         const { errors } = donation.validateSync();
         assert.equal(errors.quantity.kind, 'Number');
         assert.equal(errors.eta.kind, 'String');
-        assert.equal(errors.location.kind, 'ObjectID');
+        assert.equal(errors.dropSite.kind, 'ObjectID');
     });
 });
