@@ -34,9 +34,9 @@ describe('donation API', () => {
     });
 
     beforeEach(() => {
-        testDonations.push({quantity: 6, eta: '4:30PM', dropSite: savedDropSite._id});
-        testDonations.push({quantity: 9, eta: '6:30PM', dropSite: savedDropSite._id});
-        testDonations.push({quantity: 3, eta: '9:30PM', dropSite: savedDropSite._id});
+        testDonations.push({quantity: 6, date: '2017-01-01', dropSite: savedDropSite._id});
+        testDonations.push({quantity: 9, date: '2017-02-01', dropSite: savedDropSite._id});
+        testDonations.push({quantity: 3, date: '2017-03-01', dropSite: savedDropSite._id});
     });
 
     it('Should save a donation with an id', () => {
@@ -45,9 +45,11 @@ describe('donation API', () => {
             .send(testDonations[1])
             .then(({ body }) => {
                 const savedDonation = body;
+                console.log('body in donation', body);
                 assert.ok(savedDonation._id);
                 assert.equal(savedDonation.quantity, testDonations[1].quantity);
-                assert.equal(savedDonation.eta, testDonations[1].eta);
+                // assert.equal(savedDonation.date, testDonations[1].date);
+                assert.ok(savedDonation.date);
                 assert.equal(savedDonation.dropSite, testDonations[1].dropSite);
             });
     });
@@ -95,7 +97,7 @@ describe('donation API', () => {
             .send(badDonation)
             .then(({ body }) => savedDonation = body)
             .then(() => {
-                badDonation.eta = 'New  eta';
+                badDonation.quantity = '11';
                 return request.put(`/api/donations/${savedDonation._id}`)
                     .set('Authorization', token)
                     .send(badDonation);

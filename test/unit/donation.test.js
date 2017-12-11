@@ -36,7 +36,7 @@ describe('Donation model', () =>  {
     it('Should validate a good model', () => {
         const donation = new Donation({
             quantity: 6,
-            eta: '4:30PM',
+            date: '1970-01-01',
             dropSite: savedDropSite._id,
         });
         assert.equal(donation.validateSync(), undefined);
@@ -46,19 +46,19 @@ describe('Donation model', () =>  {
         const donation = new Donation({});
         const { errors } = donation.validateSync();
         assert.equal(errors.quantity.kind, 'required');
-        assert.equal(errors.eta.kind, 'required');
+        // assert.equal(errors.date.kind, 'required');
         assert.equal(errors.dropSite.kind, 'required');
     });
 
     it('Should throw error for incorrect data types', () => {
         const donation = new Donation({
             quantity: {},
-            eta: {},
+            date: {},
             dropSite: {}
         });
         const { errors } = donation.validateSync();
         assert.equal(errors.quantity.kind, 'Number');
-        assert.equal(errors.eta.kind, 'String');
+        assert.equal(errors.date.kind, 'Date');
         assert.equal(errors.dropSite.kind, 'ObjectID');
     });
 });
