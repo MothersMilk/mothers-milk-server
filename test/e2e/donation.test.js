@@ -6,24 +6,24 @@ const assert = chai.assert;
 describe('donation API', () => {
     beforeEach(() => mongoose.connection.dropDatabase());
 
-    let savedLocation = null;
+    let savedDropSite = null;
     const testDonations = [];
-    const location = {
+    const dropSite = {
         name: 'Northwest Mothers Milk Bank',
         address: '417 SW 117th Ave, Portland, OR 97225',
         hours: '8AM–4:30PM'
     };
 
     beforeEach(() => {
-        return request.post('/api/locations')
-            .send(location)
-            .then(({ body }) => savedLocation = body);
+        return request.post('/api/dropSites')
+            .send(dropSite)
+            .then(({ body }) => savedDropSite = body);
     });
 
     beforeEach(() => {
-        testDonations.push({quantity: 6, eta: '4:30PM', location: savedLocation._id});
-        testDonations.push({quantity: 9, eta: '6:30PM', location: savedLocation._id});
-        testDonations.push({quantity: 3, eta: '9:30PM', location: savedLocation._id});
+        testDonations.push({quantity: 6, eta: '4:30PM', dropSite: savedDropSite._id});
+        testDonations.push({quantity: 9, eta: '6:30PM', dropSite: savedDropSite._id});
+        testDonations.push({quantity: 3, eta: '9:30PM', dropSite: savedDropSite._id});
     });
 
     it('Should save a donation with an id', () => {
@@ -34,7 +34,7 @@ describe('donation API', () => {
                 assert.ok(savedDonation._id);
                 assert.equal(savedDonation.quantity, testDonations[1].quantity);
                 assert.equal(savedDonation.eta, testDonations[1].eta);
-                assert.equal(savedDonation.location, testDonations[1].location);
+                assert.equal(savedDonation.dropSite, testDonations[1].dropSite);
             });
     });
 
