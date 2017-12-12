@@ -25,7 +25,7 @@ describe.only('supplies API', () => {
         {
             bags: 1,
             boxes: 3,
-            fulfilled: false
+            fulfilled: true
         }
     ];
 
@@ -96,7 +96,7 @@ describe.only('supplies API', () => {
             });
     });
 
-    it('get all supplies', () => {
+    it('Should get all supplies', () => {
         const testSupplies = [testData[1], testData[2]].map(supply => {
             return request.post('/api/supplies')
                 .send(supply)
@@ -112,25 +112,18 @@ describe.only('supplies API', () => {
             });
     });
 
-    it('updates the supplies by id', () => {
-        
-        let savedSupply = null;
-        let changeSupplies = {
-            bags: 9,
-            boxes: 2,
-            fulfilled: true
-        };
-
+    it('Should update a supply by id', () => {
         return request.post('/api/supplies')
-            .send(suppliesTest)
-            .then(({ body }) => savedSupply = body)
-            .then(() => {
-                changeSupplies.Donor = savedSupply.Donor;
+            .send(testData[1])
+            .then(({ body: savedSupply}) => savedSupply)
+            .then(savedSupply => {
                 return request.put(`/api/supplies/${savedSupply._id}`)
-                    .send(changeSupplies);
+                    .send(testData[2]);
             })
-            .then(({ body }) => {
-                assert.deepEqual(body.fulfilled, true);
+            .then(({ body: updatedSupply }) => {
+                assert.deepEqual(updatedSupply.bags, testData[2].bags);
+                assert.deepEqual(updatedSupply.boxes, testData[2].boxes);
+                assert.deepEqual(updatedSupply.fulfilled, testData[2].fulfilled);
             });
     });
 });
