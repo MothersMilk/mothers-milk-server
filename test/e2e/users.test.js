@@ -77,24 +77,20 @@ describe.only('user API', () => {
             });
     });
 
-    it('gets all user', () => {
-        
-        const posts = testUsers.map(user => {
+    it('Should get all users', () => {
+        const saveUsers = testUsers.map(user => {
             return request.post('/api/users')
                 .set('Authorization', token)
                 .send(user)
                 .then(res => res.body);
         });
-
-        let saved = null;
-        return Promise.all(posts)
-            .then(_saved => {
-                saved = _saved;
+        return Promise.all(saveUsers)
+            .then(savedUsers => {
                 return request.get('/api/users')
-                    .set('Authorization', token);
-            })
-            .then(res => {
-                assert.equal(res.body.length, saved.length);
+                    .set('Authorization', token)
+                    .then(({ body }) => {
+                        assert.equal(body.length, savedUsers.length);
+                    });
             });
     });
 
