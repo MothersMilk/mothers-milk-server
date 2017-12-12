@@ -60,13 +60,13 @@ describe('donation API', () => {
     });
 
     it('Should get all saved donations', () => {
-        const saveDonations = testDonations.map( donation => {
+        const saveDonations = testDonations.map(donation => {
             return request.post('/api/donations')
                 .set('Authorization', token)
                 .send(donation)
                 .then(({ body: savedDonation }) => savedDonation );
         });
-
+        
         return Promise.all(saveDonations)
             .then(savedDonations => {
                 return request.get('/api/donations')

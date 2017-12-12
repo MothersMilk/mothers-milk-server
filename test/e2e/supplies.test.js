@@ -45,6 +45,7 @@ describe('supplies API', () => {
             .set('Authorization', token)
             .send(testData[0])
             .then(({ body }) => {
+                console.log('working in user post.....')
                 testData[1].Donor = body.newUser._id;
                 testData[2].Donor = body.newUser._id;
                 //remove
@@ -56,10 +57,12 @@ describe('supplies API', () => {
     
 
     it('Shoud save a supply with id', () => {
+        console.log('mmm token ,,,,,', token)
         return request.post('/api/supplies')
             .set('Authorization', token)
             .send(testData[1])
             .then(({ body }) => {
+                console.log('posting...');
                 assert.ok(body._id);
                 assert.equal(body.bags, testData[1].bags);
                 assert.equal(body.boxes, testData[1].boxes);
