@@ -93,19 +93,21 @@ describe.only('dropSite API', () => {
             });
     });
 
-    it('Should update a dropSite by id', () => {
-        const badDropSite = testDropSites[1];
-        let savedDropSite = null; 
+    it('Should update a dropSite by id', () => { 
         return request.post('/api/dropSites')
             .set('Authorization', token)
-            .send(badDropSite)
-            .then(({ body }) => savedDropSite = body)
-            .then(() => {
-                badDropSite.address = 'New address';
+            .send(testDropSites[0])
+            .then(({ body: savedDropSite }) => savedDropSite)
+            .then(savedDropSite => {
                 return request.put(`/api/dropSites/${savedDropSite._id}`)
                     .set('Authorization', token)
-                    .send(badDropSite);
+                    .send(testDropSites[1]);
             })
-            .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
+            .then(({ body }) => {
+                assert.deepEqual(body.name, testDropSites[1].name);
+                assert.deepEqual(body.hours, testDropSites[1].hours);
+                assert.deepEqual(body.address, testDropSites[1].address);
+                
+            });
     });
 });
