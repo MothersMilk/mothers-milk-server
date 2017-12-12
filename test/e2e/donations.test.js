@@ -94,19 +94,20 @@ describe.only('donation API', () => {
     });
 
     it('Should update a donation by id', () => {
-        const badDonation = testDonations[1];
-        let savedDonation = null; 
         return request.post('/api/donations')
             .set('Authorization', token)
-            .send(badDonation)
-            .then(({ body }) => savedDonation = body)
-            .then(() => {
-                badDonation.quantity = '11';
+            .send(testDonations[0])
+            .then(({ body: savedDonation }) => savedDonation)
+            .then(savedDonation => {
                 return request.put(`/api/donations/${savedDonation._id}`)
                     .set('Authorization', token)
-                    .send(badDonation);
+                    .send(testDonations[1]);
             })
-            .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
+            .then(({ body: updatedDonation }) => {
+                assert.deepEqual(updatedDonation.quantity, testDonations[1].quantity);
+                assert.deepEqual(updatedDonation.dropSite, testDonations[1].dropSite);
+                assert.deepEqual(updatedDonation.Donor, testDonations[1].Donor);
+            });
     });
 
     it('Should delete a donation', () => {
