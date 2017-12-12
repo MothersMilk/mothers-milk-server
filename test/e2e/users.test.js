@@ -124,13 +124,20 @@ describe('user API', () => {
             name: 'updatedName',
             roles: ['updated roles']
         };
-        return request.put('/api/users/me')
+        let notAdminToken;
+        return request.post('/api/users')
             .set('Authorization', token)
-            .send(changeuser)
-            .then(({ body }) => {
-                assert.equal(body.name, 'updatedName');
-                assert.deepEqual(body.roles, testUser.roles);
-                assert.equal(body.email, testUser.email);
+            .send(testUser)
+            .then(({ body })=> notAdminToken = body.token)
+            .then(()=>{
+                return request.put('/api/users/me')
+                    .set('Authorization', notAdminToken)
+                    .send(changeuser)
+                    .then(({ body }) => {
+                        assert.equal(body.name, 'updatedName');
+                        assert.deepEqual(body.roles, testUser.roles);
+                        assert.equal(body.email, testUser.email);
+                    });
             });
     });
     
