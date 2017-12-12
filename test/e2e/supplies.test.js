@@ -1,10 +1,9 @@
 const request = require('./request');
 const mongoose = require('mongoose');
 const assert = require('chai').assert;
-const User = require('../../lib/models/user');
-const tokenService = require('../../lib/utils/token-service');
+const adminToken = require('./adminToken');
 
-describe('supplies API', () => {
+describe.only('supplies API', () => {
 
     beforeEach(() => mongoose.connection.dropDatabase());
     let token = '';
@@ -18,19 +17,7 @@ describe('supplies API', () => {
         boxes: 3,
         fulfilled: false
     };
-    beforeEach(() => {
-        const user = new User({
-            email: 'teststaff@test.com',
-            name: 'Test staff',
-            roles: ['admin']
-        });
-        user.generateHash('password');
-        return user.save()
-            .then(user => {
-                return tokenService.sign(user);
-            })
-            .then(signed => token = signed );
-    });
+    beforeEach(async() => token = await adminToken());
 
     beforeEach(() => {
         return request.post('/api/users')
