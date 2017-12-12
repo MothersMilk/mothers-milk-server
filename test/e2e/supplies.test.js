@@ -68,23 +68,21 @@ describe.only('supplies API', () => {
     });
 
     it('deletes with id', () => {
-        let supply = null;
         return request.post('/api/supplies')
-            .send(suppliesTest)
-            .then(res => {
-                supply = res.body;
-                return request.delete(`/api/supplies/${supply._id}`);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, { removed: true });
-                return request.get(`/api/supplies/${supply._id}`);
-            })
-            .then(
-                () => { throw new Error('Unexpected successful response'); },
-                err => {
-                    assert.equal(err.status, 404);
-                }
-            );
+            .send(testData[1])
+            .then(({ body: supply }) => {
+                return request.delete(`/api/supplies/${supply._id}`)
+                    .then(({ body: response }) => {
+                        assert.deepEqual(response, { removed: true });
+                        return request.get(`/api/supplies/${supply._id}`);
+                    })
+                    .then(
+                        () => { throw new Error('Unexpected successful response'); },
+                        err => {
+                            assert.equal(err.status, 404);
+                        }
+                    );
+            });
     });
 
     it('gets by id', () => {
