@@ -2,10 +2,11 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
-const User = require('../../lib/models/user');
-const tokenService = require('../../lib/utils/token-service');
+const adminToken = require('./testAdmin');
+// const User = require('../../lib/models/user');
+// const tokenService = require('../../lib/utils/token-service');
 
-describe('user API', () => {
+describe.only('user API', () => {
 
     beforeEach(() => mongoose.connection.dropDatabase());
 
@@ -23,21 +24,10 @@ describe('user API', () => {
         roles: ['admin'],
         password: '2'
     };
-    let anotherTestUser = '';
     let token = '';
 
-    beforeEach(() => {
-        const user = new User({
-            email: 'teststaff@test.com',
-            name: 'Test staff',
-            roles: ['admin']
-        });
-        user.generateHash('password');
-        return user.save()
-            .then(user => {
-                return tokenService.sign(user);
-            })
-            .then(signed => token = signed );
+    beforeEach(async() => {
+        token = await adminToken();
     });
 
     it('saves with id', () => {
@@ -109,7 +99,6 @@ describe('user API', () => {
         return Promise.all(posts)
             .then(_saved => {
                 saved = _saved;
-                saved.push(anotherTestUser);
                 return request.get('/api/users')
                     .set('Authorization', token);
             })
