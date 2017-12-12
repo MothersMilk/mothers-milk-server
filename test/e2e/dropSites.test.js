@@ -5,7 +5,7 @@ const assert = chai.assert;
 const adminToken = require('./adminToken');
 
 
-describe('dropSite API', () => {
+describe.only('dropSite API', () => {
 
     let token = '';
     beforeEach(() => mongoose.connection.dropDatabase());
@@ -33,8 +33,7 @@ describe('dropSite API', () => {
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
-            .then(({ body }) => {
-                const savedDropSite = body;
+            .then(({ body: savedDropSite }) => {
                 assert.ok(savedDropSite._id);
                 assert.equal(savedDropSite.name, testDropSites[1].name);
                 assert.equal(savedDropSite.address, testDropSites[1].address);
@@ -47,15 +46,15 @@ describe('dropSite API', () => {
             return request.post('/api/dropSites')
                 .set('Authorization', token)
                 .send(dropSite)
-                .then(({ body }) => body );
+                .then(({ body: savedDropSite }) => savedDropSite );
         });
 
         return Promise.all(saveDropSites)
             .then(savedDropSites => {
                 return request.get('/api/dropSites')
                     .set('Authorization', token)
-                    .then(({ body }) => {
-                        const gotDropSites = body.sort((a, b) => a._id < b._id);
+                    .then(({ body: gotDropSites }) => {
+                        gotDropSites = gotDropSites.sort((a, b) => a._id < b._id);
                         savedDropSites = savedDropSites.sort((a, b) => a._id < b._id);
                         assert.deepEqual(savedDropSites, gotDropSites);
                     });
