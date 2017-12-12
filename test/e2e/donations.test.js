@@ -38,7 +38,6 @@ describe('donation API', () => {
         testDonations.push({quantity: 6, date: '2017-01-01', dropSite: savedDropSite._id});
         testDonations.push({quantity: 9, date: '2017-02-01', dropSite: savedDropSite._id});
         testDonations.push({quantity: 3, date: '2017-03-01', dropSite: savedDropSite._id});
-        console.log('in beforeEach', testDonations);
     });
 
     before(() => {
@@ -52,7 +51,6 @@ describe('donation API', () => {
                 testDonations[0].Donor = body._id;
                 testDonations[1].Donor = body._id;
                 testDonations[2].Donor = body._id;
-                console.log('bodyid', testDonations);
             });
     });
 
@@ -62,7 +60,6 @@ describe('donation API', () => {
             .send(testDonations[1])
             .then(({ body }) => {
                 const savedDonation = body;
-                console.log('body in donation', body.Donor);
                 assert.ok(savedDonation._id);
                 assert.equal(savedDonation.quantity, testDonations[1].quantity);
                 // assert.equal(savedDonation.date, testDonations[1].date);
@@ -74,7 +71,6 @@ describe('donation API', () => {
         mongoose.connection.dropDatabase();
         
         const saveDonations = testDonations.map( donation => {
-            console.log('in map', donation);
             return request.post('/api/donations')
                 .set('Authorization', token)
                 .send(donation)
@@ -83,11 +79,9 @@ describe('donation API', () => {
 
         return Promise.all(saveDonations)
             .then(savedDonations => {
-                console.log('in map2', savedDonations);
                 return request.get('/api/donations')
                     .set('Authorization', token)
                     .then(({ body }) => {
-                        console.log('in body', body);
                         const gotDonations = body.sort((a, b) => a._id < b._id);
                         savedDonations = savedDonations.sort((a, b) => a._id < b._id);
                         assert.deepEqual(savedDonations, gotDonations);
