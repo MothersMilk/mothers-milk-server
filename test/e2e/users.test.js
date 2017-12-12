@@ -42,40 +42,38 @@ describe.only('user API', () => {
     });
 
     it('Should remove a user by id', () => {
-        let user = null;
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[1])
             .then(({ body }) => {
-                user = body.newUser;
-                return request.delete(`/api/users/${user._id}`)
-                    .set('Authorization', token);
-            })
-            .then(({ body }) => {
-                assert.deepEqual(body, { removed: true });
-                return request.get(`/api/users/${user._id}`)
-                    .set('Authorization', token);
-            })
-            .then(
-                () => { throw new Error('Unexpected successful response'); },
-                err => {
-                    assert.equal(err.status, 404);
-                }
-            );
+                const { newUser } = body;
+                return request.delete(`/api/users/${newUser._id}`)
+                    .set('Authorization', token)
+                    .then(({ body }) => {
+                        assert.deepEqual(body, { removed: true });
+                        return request.get(`/api/users/${newUser._id}`)
+                            .set('Authorization', token);
+                    })
+                    .then(
+                        () => { throw new Error('Unexpected successful response'); },
+                        err => {
+                            assert.equal(err.status, 404);
+                        }
+                    );
+            });
     });
 
-    it('get by id', () => {
-        let user = null;
+    it('Should get a user by id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[1])
-            .then(res => {
-                user = res.body.newUser;
-                return request.get(`/api/users/${user._id}`)
-                    .set('Authorization', token);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, user);
+            .then(({ body }) => {
+                const { newUser }= body;
+                return request.get(`/api/users/${newUser._id}`)
+                    .set('Authorization', token)
+                    .then(res => {
+                        assert.deepEqual(res.body, newUser);
+                    });
             });
     });
 
