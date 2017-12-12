@@ -27,7 +27,6 @@ describe('supplies API', () => {
         user.generateHash('password');
         return user.save()
             .then(user => {
-                console.log('user', user);
                 return tokenService.sign(user);
             })
             .then(signed => token = signed );

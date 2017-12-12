@@ -17,7 +17,6 @@ describe('donation API', () => {
         user.generateHash('password');
         return user.save()
             .then(user => {
-                console.log('user', user);
                 return tokenService.sign(user);
             })
             .then(signed => token = signed );
@@ -47,7 +46,6 @@ describe('donation API', () => {
     });
 
     before(() => {
-        console.log('got to third before each');
         return request.post('/api/users')
             .set('Authorization', token)
             .send({
