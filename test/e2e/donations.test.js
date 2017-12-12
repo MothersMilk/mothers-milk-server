@@ -4,7 +4,7 @@ const request = require('./request');
 const assert = chai.assert;
 const adminToken = require('./adminToken');
 
-describe.only('donation API', () => {
+describe('donation API', () => {
 
     let token = '';
     let testDonations = [];

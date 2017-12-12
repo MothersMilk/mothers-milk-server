@@ -3,8 +3,8 @@ const tokenService = require('../../lib/utils/token-service');
 
 
 const user = new User({
-    email: 'teststaff@test.com',
-    name: 'Test staff',
+    email: 'superadmin@admin.com',
+    name: 'super admin',
     roles: ['admin']
 });
 user.generateHash('password');
