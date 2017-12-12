@@ -1,6 +1,8 @@
 const request = require('./request');
 const assert = require('chai').assert;
 const mongoose = require('mongoose');
+const User = require('../../lib/models/user');
+const tokenService = require('../../lib/utils/token-service');
 
 
 describe('Auth API', () => {
@@ -9,14 +11,17 @@ describe('Auth API', () => {
     
     let token = null; 
     beforeEach(()=>{
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password'
+        const user = new User({
+            email: 'teststaff@test.com',
+            name: 'Test staff',
+            roles: ['admin']
+        });
+        user.generateHash('password');
+        return user.save()
+            .then(user => {
+                return tokenService.sign(user);
             })
-            .then(({ body }) => token = body.token);
+            .then(signed => token = signed );
     });
 
     it('Should generate a token on signup', () => {
@@ -24,8 +29,8 @@ describe('Auth API', () => {
     });
 
     it('throws error if email already exists',() => {
-        return request
-            .post('/api/auth/signup')
+        return request.post('/api/users')
+            .set('Authorization', token)
             .send({
                 email: 'teststaff@test.com',
                 name: 'Test staff',
