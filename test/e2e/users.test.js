@@ -35,24 +35,24 @@ describe.only('user API', () => {
             .set('Authorization', token)
             .send(testUsers[1])
             .then(({ body }) => {
-                const savedUser = body.newUser;
-                assert.ok(savedUser._id);
-                assert.equal(savedUser.name, testUsers[1].name);
+                const { newUser } = body;
+                assert.ok(newUser._id);
+                assert.equal(newUser.name, testUsers[1].name);
             });
     });
 
-    it('removes by id', () => {
+    it('Should remove a user by id', () => {
         let user = null;
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[1])
-            .then(res => {
-                user = res.body.newUser;
+            .then(({ body }) => {
+                user = body.newUser;
                 return request.delete(`/api/users/${user._id}`)
                     .set('Authorization', token);
             })
-            .then(res => {
-                assert.deepEqual(res.body, { removed: true });
+            .then(({ body }) => {
+                assert.deepEqual(body, { removed: true });
                 return request.get(`/api/users/${user._id}`)
                     .set('Authorization', token);
             })
