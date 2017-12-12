@@ -65,17 +65,16 @@ describe.only('dropSite API', () => {
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
-            .then(({ body }) => {
-                const savedDropSite = body;
+            .then(({ body: savedDropSite }) => {
                 return request.delete(`/api/dropSites/${savedDropSite._id}`)
                     .set('Authorization', token);
             })
-            .then( ({ body }) => {
-                assert.deepEqual(body, { removed: true });
+            .then( ({ body: deleteResponse }) => {
+                assert.deepEqual(deleteResponse, { removed: true });
                 return request.get('/api/dropSites')
                     .set('Authorization', token)
-                    .then( ({ body })=>{
-                        assert.deepEqual(body, []);
+                    .then( ({ body: gotDropSites })=>{
+                        assert.deepEqual(gotDropSites, []);
                     });
             });
     });
