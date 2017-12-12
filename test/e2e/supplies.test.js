@@ -97,22 +97,18 @@ describe.only('supplies API', () => {
     });
 
     it('get all supplies', () => {
-        
-
-        const posts = [suppliesTest, supplyTwo].map(supply => {
+        const testSupplies = [testData[1], testData[2]].map(supply => {
             return request.post('/api/supplies')
                 .send(supply)
-                .then(res => res.body);
+                .then(({ body }) => body);
         });
 
-        let saved = null;
-        return Promise.all(posts)
-            .then(_saved => {
-                saved = _saved;
-                return request.get('/api/supplies');
-            })
-            .then(res => {
-                assert.deepEqual(res.body, saved);
+        return Promise.all(testSupplies)
+            .then(savedTestSupplies => {
+                return request.get('/api/supplies')
+                    .then(({ body: gotSupplies }) => {
+                        assert.deepEqual(gotSupplies, savedTestSupplies);
+                    });
             });
     });
 
