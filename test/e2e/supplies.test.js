@@ -29,16 +29,7 @@ describe('supplies API', () => {
         }
     ];
 
-    const suppliesTest = {
-        bags: 9,
-        boxes: 2,
-        fulfilled: false
-    };
-    const supplyTwo = {
-        bags: 1,
-        boxes: 3,
-        fulfilled: false
-    };
+    
 
     beforeEach(() => {
         return request.post('/api/users')
@@ -46,10 +37,7 @@ describe('supplies API', () => {
             .send(testData[0])
             .then(({ body }) => {
                 testData[1].Donor = body.newUser._id;
-                testData[2].Donor = body.newUser._id;
-                //remove
-                supplyTwo.Donor = body.newUser._id;
-                suppliesTest.Donor = body.newUser._id;
+                testData[2].Donor = body.newUser._id;  
             });
     });
 

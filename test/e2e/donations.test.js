@@ -4,12 +4,13 @@ const request = require('./request');
 const assert = chai.assert;
 const adminToken = require('./adminToken');
 
-describe('donation API', () => {
+describe.only('donation API', () => {
 
     let token = '';
     let testDonations = [];
     beforeEach(() => mongoose.connection.dropDatabase());
     beforeEach(async() => token = await adminToken());
+    
 
     const testDropSite = {
         name: 'Northwest Mothers Milk Bank',
@@ -60,7 +61,7 @@ describe('donation API', () => {
     });
 
     it('Should get all saved donations', () => {
-        const saveDonations = testDonations.map( donation => {
+        const saveDonations = testDonations.map(donation => {
             return request.post('/api/donations')
                 .set('Authorization', token)
                 .send(donation)
