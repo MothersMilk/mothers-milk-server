@@ -2,6 +2,8 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
+const User = require('../../lib/models/user');
+const tokenService = require('../../lib/utils/token-service');
 
 
 describe('dropSite API', () => {
@@ -9,14 +11,17 @@ describe('dropSite API', () => {
 
     let token = '';
     beforeEach(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
+        const user = new User({
+            email: 'teststaff@test.com',
+            name: 'Test staff',
+            roles: ['admin']
+        });
+        user.generateHash('password');
+        return user.save()
+            .then(user => {
+                return tokenService.sign(user);
             })
-            .then(({ body }) => token = body.token);
+            .then(signed => token = signed );
     });
 
     const testDropSites = [
