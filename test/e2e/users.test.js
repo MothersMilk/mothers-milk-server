@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
 const User = require('../../lib/models/user');
+const tokenService = require('../../lib/utils/token-service');
 
 describe('user API', () => {
 
@@ -26,12 +27,17 @@ describe('user API', () => {
     let token = '';
 
     beforeEach(() => {
-        return request.post('/api/auth/signup')
-            .send(testUser)
-            .then(userToken => {
-                anotherTestUser = userToken.body.newUser;
-                token = userToken.body.token;
-            });
+        const user = new User({
+            email: 'teststaff@test.com',
+            name: 'Test staff',
+            roles: ['admin']
+        });
+        user.generateHash('password');
+        return user.save()
+            .then(user => {
+                return tokenService.sign(user);
+            })
+            .then(signed => token = signed );
     });
 
     it('saves with id', () => {
