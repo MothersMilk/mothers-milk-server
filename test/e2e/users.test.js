@@ -112,22 +112,20 @@ describe.only('user API', () => {
     });
     
 
-    it('updates the user by id', () => {
-        let changeuser = {
-            name: 'Michelle',
-            hash: '123'
-        };
-        let saveduser = null;
-
+    it('Should update all fileds of user with admin token', () => {
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUsers[1])
-            .then(({ body }) => saveduser = body.newUser)
-            .then(() => {
-                return request.put(`/api/users/${saveduser._id}`)
+            .send(testUsers[0])
+            .then(({ body }) => body.newUser)
+            .then( user => {
+                return request.put(`/api/users/${user._id}`)
                     .set('Authorization', token)
-                    .send(changeuser);
+                    .send(testUsers[1]);
             })
-            .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
+            .then(({ body }) => {
+                assert.deepEqual(body.name, testUsers[1].name);
+                assert.deepEqual(body.email, testUsers[1].email);
+                assert.deepEqual(body.roles, testUsers[1].roles);
+            });
     });
 });
