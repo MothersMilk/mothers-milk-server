@@ -45,7 +45,7 @@ describe('Auth API', () => {
     });
 
     it('Should throw an error if password is not included', () => {
-        return request.post('/api/auth/signup')
+        return request.post('/api/users')
             .set('Authorization', token)
             .send({ 
                 email: 'teststaff@test.com',
