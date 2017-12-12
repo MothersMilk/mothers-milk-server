@@ -80,16 +80,15 @@ describe.only('dropSite API', () => {
     });
 
     it('Should get a dropSite by id', ()=>{
-        let dropSite;
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
-            .then(res => dropSite = res.body )
-            .then(()=>{
-                return request.get(`/api/dropSites/${dropSite._id}`)
+            .then(({ body: savedDropSite }) => savedDropSite)
+            .then( savedDropSite => {
+                return request.get(`/api/dropSites/${savedDropSite._id}`)
                     .set('Authorization', token)
-                    .then(res =>{
-                        assert.deepEqual(res.body, dropSite);
+                    .then(({ body: gotDropSite }) =>{
+                        assert.deepEqual(gotDropSite, savedDropSite);
                     });
             });
     });
