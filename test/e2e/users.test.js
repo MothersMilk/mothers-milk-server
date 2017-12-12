@@ -111,6 +111,26 @@ describe('user API', () => {
             });
     });
 
+    it('Should only update name field with non admin token', () => {
+        let changeuser = {
+            email: 'updatedEmail',
+            name: 'updatedName',
+            hash: 'updatedhash',
+            roles: ['updated roles']
+        };
+        
+        return request.post('/api/users')
+            .set('Authorization', token)
+            .send(testUser2)
+            .then(() => {
+                return request.put('/api/users/me')
+                    .set('Authorization', token)
+                    .send(changeuser);
+            })
+            .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
+    });
+    
+
     it('updates the user by id', () => {
         let changeuser = {
             name: 'Michelle',
