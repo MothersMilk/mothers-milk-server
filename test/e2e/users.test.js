@@ -2,96 +2,130 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
+const adminToken = require('./adminToken');
 
-describe('user API', () => {
 
+describe('users API', () => {
+
+    let token = '';
     beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
 
-    const testUser = {
-        name: 'Michele',
-        hash: '123'
-    };
+    const testUsers = [
+        {
+            name: 'Michele',
+            hash: '12356',
+            email: 'Michele@test.com',
+            roles: ['admin'],
+            password: 'Michele-Password'
+        },
+        {
+            name: 'Shane',
+            hash: 'abcdefg',
+            email: 'Shane@test.com',
+            roles: ['admin'],
+            password: 'Shane-password'
+        }
 
-    it('saves with id', () => {
+    ];
+    
+
+    it('Should save a user with id', () => {
         return request.post('/api/users')
-            .send(testUser)
-            .then(res => {
-                const user = res.body;
-                assert.ok(user._id);
-                assert.equal(user.name, testUser.name);
+            .set('Authorization', token)
+            .send(testUsers[1])
+            .then(({ body }) => {
+                const { newUser } = body;
+                assert.ok(newUser._id);
+                assert.equal(newUser.name, testUsers[1].name);
             });
     });
 
-    it('removes by id', () => {
-        let user = null;
+    it('Should remove a user by id', () => {
         return request.post('/api/users')
-            .send(testUser)
-            .then(res => {
-                user = res.body;
-                return request.delete(`/api/users/${user._id}`);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, { removed: true });
-                return request.get(`/api/users/${user._id}`);
-            })
-            .then(
-                () => { throw new Error('Unexpected successful response'); },
-                err => {
-                    assert.equal(err.status, 404);
-                }
-            );
-    });
-
-    it('get by id', () => {
-        let user = null;
-        return request.post('/api/users')
-            .send(testUser)
-            .then(res => {
-                user = res.body;
-                return request.get(`/api/users/${user._id}`);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, user);
+            .set('Authorization', token)
+            .send(testUsers[1])
+            .then(({ body }) => {
+                const { newUser } = body;
+                return request.delete(`/api/users/${newUser._id}`)
+                    .set('Authorization', token)
+                    .then(({ body }) => {
+                        assert.deepEqual(body, { removed: true });
+                        return request.get(`/api/users/${newUser._id}`)
+                            .set('Authorization', token);
+                    })
+                    .then(
+                        () => { throw new Error('Unexpected successful response'); },
+                        err => {
+                            assert.equal(err.status, 404);
+                        }
+                    );
             });
     });
 
-    it('gets all user', () => {
-        const otheruser = {
-            name: 'Tina',
-            hash: '345'
-        };
-        
-        const posts = [testUser, otheruser].map(user => {
+    it('Should get a user by id', () => {
+        return request.post('/api/users')
+            .set('Authorization', token)
+            .send(testUsers[1])
+            .then(({ body }) => {
+                const { newUser }= body;
+                return request.get(`/api/users/${newUser._id}`)
+                    .set('Authorization', token)
+                    .then(res => {
+                        assert.deepEqual(res.body, newUser);
+                    });
+            });
+    });
+
+    it('Should get all users', () => {
+        const saveUsers = testUsers.map(user => {
             return request.post('/api/users')
+                .set('Authorization', token)
                 .send(user)
-                .then(res => res.body);
+                .then(({ body }) => body);
         });
-
-        let saved = null;
-        return Promise.all(posts)
-            .then(_saved => {
-                saved = _saved;
-                return request.get('/api/users');
-            })
-            .then(res => {
-                assert.deepEqual(res.body, saved);
+        return Promise.all(saveUsers)
+            .then(savedUsers => {
+                return request.get('/api/users')
+                    .set('Authorization', token)
+                    .then(({ body }) => {
+                        assert.equal(body.length, savedUsers.length);
+                    });
             });
     });
 
-    it('updates the user by id', () => {
-        let changeuser = {
-            name: 'Michelle',
-            hash: '123'
-        };
-        let saveduser = null;
-
+    it('Should only update name field with without admin token', () => {
         return request.post('/api/users')
-            .send(testUser)
-            .then(({ body }) => saveduser = body)
-            .then(() => {
-                return request.put(`/api/users/${saveduser._id}`)
-                    .send(changeuser);
+            .set('Authorization', token)
+            .send(testUsers[0])
+            .then(({ body })=> body.token)
+            .then( userToken =>{
+                return request.put('/api/users/me')
+                    .set('Authorization', userToken)
+                    .send(testUsers[1])
+                    .then(({ body }) => {
+                        assert.equal(body.name, testUsers[1].name);
+                        assert.deepEqual(body.roles, testUsers[0].roles);
+                        assert.equal(body.email, testUsers[0].email);
+                    });
+            });
+    });
+    
+
+    it('Should update all fileds of user with admin token', () => {
+        return request.post('/api/users')
+            .set('Authorization', token)
+            .send(testUsers[0])
+            .then(({ body }) => body.newUser)
+            .then( user => {
+                return request.put(`/api/users/${user._id}`)
+                    .set('Authorization', token)
+                    .send(testUsers[1]);
             })
-            .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
+            .then(({ body }) => {
+                assert.deepEqual(body.name, testUsers[1].name);
+                assert.deepEqual(body.email, testUsers[1].email);
+                assert.deepEqual(body.roles, testUsers[1].roles);
+            });
     });
 });

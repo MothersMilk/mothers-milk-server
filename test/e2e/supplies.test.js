@@ -1,11 +1,34 @@
 const request = require('./request');
 const mongoose = require('mongoose');
 const assert = require('chai').assert;
+const adminToken = require('./adminToken');
 
 describe('supplies API', () => {
 
-    beforeEach(() => mongoose.connection.dropDatabase());
     let token = '';
+    beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
+
+    const testData = [
+        {
+            email: 'testDonor@gmail.com',
+            name: 'Test DOnor',
+            password: 'password',
+            hash: '234',
+            roles: ['donor']
+        },
+        {
+            bags: 9,
+            boxes: 2,
+            fulfilled: false
+        },
+        {
+            bags: 1,
+            boxes: 3,
+            fulfilled: true
+        }
+    ];
+
     const suppliesTest = {
         bags: 9,
         boxes: 2,
@@ -16,129 +39,91 @@ describe('supplies API', () => {
         boxes: 3,
         fulfilled: false
     };
-    beforeEach(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
-            })
-            .then(({ body }) => token = body.token);
-    });
 
     beforeEach(() => {
         return request.post('/api/users')
-            .send({
-                email: 'test@gmail.com',
-                name: 'Michele',
-                hash: '234'
-            })
+            .set('Authorization', token)
+            .send(testData[0])
             .then(({ body }) => {
-                supplyTwo.Donor = body._id;
-            });
-    });
-
-    beforeEach(() => {
-        return request.post('/api/users')
-            .send({
-                email: 'test2@gmail.com',
-                name: 'Mich',
-                hash: '235'
-            })
-            .then(({ body }) => {
-                suppliesTest.Donor = body._id;
+                testData[1].Donor = body.newUser._id;
+                testData[2].Donor = body.newUser._id;
+                //remove
+                supplyTwo.Donor = body.newUser._id;
+                suppliesTest.Donor = body.newUser._id;
             });
     });
 
     
 
-    it('saves with id', () => {
-        
+    it('Shoud save a supply with id', () => {
         return request.post('/api/supplies')
             .set('Authorization', token)
-            .send(suppliesTest)
-            .then(res => {
-                const supplies = res.body;
-                assert.ok(supplies._id);
-                assert.equal(supplies.bags, suppliesTest.bags);
-                assert.equal(supplies.boxes, suppliesTest.boxes);
-                assert.equal(supplies.Donor, suppliesTest.Donor);
+            .send(testData[1])
+            .then(({ body }) => {
+                assert.ok(body._id);
+                assert.equal(body.bags, testData[1].bags);
+                assert.equal(body.boxes, testData[1].boxes);
+                assert.equal(body.Donor, testData[1].Donor);
             });
     });
 
-    it('deletes with id', () => {
-        let supply = null;
+    it('Should delete a spply with id', () => {
         return request.post('/api/supplies')
-            .send(suppliesTest)
-            .then(res => {
-                supply = res.body;
-                return request.delete(`/api/supplies/${supply._id}`);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, { removed: true });
-                return request.get(`/api/supplies/${supply._id}`);
-            })
-            .then(
-                () => { throw new Error('Unexpected successful response'); },
-                err => {
-                    assert.equal(err.status, 404);
-                }
-            );
-    });
-
-    it('gets by id', () => {
-        let supply = null;
-        return request.post('/api/supplies')
-            .send(suppliesTest)
-            .then(res => {
-                supply = res.body;
-                return request.get(`/api/supplies/${supply._id}`);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, supply);
+            .send(testData[1])
+            .then(({ body: supply }) => {
+                return request.delete(`/api/supplies/${supply._id}`)
+                    .then(({ body: response }) => {
+                        assert.deepEqual(response, { removed: true });
+                        return request.get(`/api/supplies/${supply._id}`);
+                    })
+                    .then(
+                        () => { throw new Error('Unexpected successful response'); },
+                        err => {
+                            assert.equal(err.status, 404);
+                        }
+                    );
             });
     });
 
-    it('get all supplies', () => {
-        
+    it('Should get a supply by id', () => {
+        return request.post('/api/supplies')
+            .send(testData[1])
+            .then(({ body: supply }) => {
+                return request.get(`/api/supplies/${supply._id}`)
+                    .then(({ body: gotSupply}) => {
+                        assert.deepEqual(gotSupply, supply);
+                    });
+            });
+    });
 
-        const posts = [suppliesTest, supplyTwo].map(supply => {
+    it('Should get all supplies', () => {
+        const testSupplies = [testData[1], testData[2]].map(supply => {
             return request.post('/api/supplies')
                 .send(supply)
-                .then(res => res.body);
+                .then(({ body }) => body);
         });
 
-        let saved = null;
-        return Promise.all(posts)
-            .then(_saved => {
-                saved = _saved;
-                return request.get('/api/supplies');
-            })
-            .then(res => {
-                assert.deepEqual(res.body, saved);
+        return Promise.all(testSupplies)
+            .then(savedTestSupplies => {
+                return request.get('/api/supplies')
+                    .then(({ body: gotSupplies }) => {
+                        assert.deepEqual(gotSupplies, savedTestSupplies);
+                    });
             });
     });
 
-    it('updates the supplies by id', () => {
-        
-        let savedSupply = null;
-        let changeSupplies = {
-            bags: 9,
-            boxes: 2,
-            fulfilled: true
-        };
-
+    it('Should update a supply by id', () => {
         return request.post('/api/supplies')
-            .send(suppliesTest)
-            .then(({ body }) => savedSupply = body)
-            .then(() => {
-                changeSupplies.Donor = savedSupply.Donor;
+            .send(testData[1])
+            .then(({ body: savedSupply}) => savedSupply)
+            .then(savedSupply => {
                 return request.put(`/api/supplies/${savedSupply._id}`)
-                    .send(changeSupplies);
+                    .send(testData[2]);
             })
-            .then(({ body }) => {
-                assert.deepEqual(body.fulfilled, true);
+            .then(({ body: updatedSupply }) => {
+                assert.deepEqual(updatedSupply.bags, testData[2].bags);
+                assert.deepEqual(updatedSupply.boxes, testData[2].boxes);
+                assert.deepEqual(updatedSupply.fulfilled, testData[2].fulfilled);
             });
     });
 });

@@ -2,55 +2,48 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
+const adminToken = require('./adminToken');
 
 describe('donation API', () => {
-    before(() => mongoose.connection.dropDatabase());
-    let token = '';
-    before(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
-            })
-            .then(({ body }) => token = body.token);
-    });
 
-    let savedDropSite = null;
-    const testDonations = [];
-    const dropSite = {
+    let token = '';
+    let testDonations = [];
+    beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
+
+    const testDropSite = {
         name: 'Northwest Mothers Milk Bank',
         address: '417 SW 117th Ave, Portland, OR 97225',
         hours: '8AM–4:30PM'
     };
 
-    before(() => {
-
+    beforeEach(() => {
         return request.post('/api/dropSites')
             .set('Authorization', token)
-            .send(dropSite)
-            .then(({ body }) => savedDropSite = body);
+            .send(testDropSite)
+            .then(({ body: savedDropSite }) => savedDropSite )
+            .then(savedDropSite => {
+                testDonations = [];
+                testDonations.push({quantity: 6, date: '2017-01-01', dropSite: savedDropSite._id});
+                testDonations.push({quantity: 9, date: '2017-02-01', dropSite: savedDropSite._id});
+                testDonations.push({quantity: 3, date: '2017-03-01', dropSite: savedDropSite._id});
+            });
     });
 
-
-    before(() => {
-        testDonations.push({quantity: 6, date: '2017-01-01', dropSite: savedDropSite._id});
-        testDonations.push({quantity: 9, date: '2017-02-01', dropSite: savedDropSite._id});
-        testDonations.push({quantity: 3, date: '2017-03-01', dropSite: savedDropSite._id});
-    });
-
-    before(() => {
+    beforeEach(() => {
         return request.post('/api/users')
+            .set('Authorization', token)
             .send({
-                email: 'test2@gmail.com',
-                name: 'Mich',
-                hash: '235'
+                email: 'testDOnor@gmail.com',
+                name: 'Test DOnor',
+                password: 'password',
+                hash: '235',
+                roles: ['donor']
             })
             .then(({ body }) => {
-                testDonations[0].Donor = body._id;
-                testDonations[1].Donor = body._id;
-                testDonations[2].Donor = body._id;
+                testDonations[0].Donor = body.newUser._id;
+                testDonations[1].Donor = body.newUser._id;
+                testDonations[2].Donor = body.newUser._id;
             });
     });
 
@@ -58,31 +51,28 @@ describe('donation API', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
-            .then(({ body }) => {
-                const savedDonation = body;
+            .then(({ body: savedDonation }) => {
                 assert.ok(savedDonation._id);
                 assert.equal(savedDonation.quantity, testDonations[1].quantity);
-                // assert.equal(savedDonation.date, testDonations[1].date);
                 assert.ok(savedDonation.date);
                 assert.equal(savedDonation.dropSite, testDonations[1].dropSite);
             });
     });
+
     it('Should get all saved donations', () => {
-        mongoose.connection.dropDatabase();
-        
         const saveDonations = testDonations.map( donation => {
             return request.post('/api/donations')
                 .set('Authorization', token)
                 .send(donation)
-                .then(({ body }) => body );
+                .then(({ body: savedDonation }) => savedDonation );
         });
 
         return Promise.all(saveDonations)
             .then(savedDonations => {
                 return request.get('/api/donations')
                     .set('Authorization', token)
-                    .then(({ body }) => {
-                        const gotDonations = body.sort((a, b) => a._id < b._id);
+                    .then(({ body: gotDonations }) => {
+                        gotDonations = gotDonations.sort((a, b) => a._id < b._id);
                         savedDonations = savedDonations.sort((a, b) => a._id < b._id);
                         assert.deepEqual(savedDonations, gotDonations);
                     });
@@ -90,54 +80,50 @@ describe('donation API', () => {
     });
 
     it('Should get a donation by id', ()=>{
-        mongoose.connection.dropDatabase();
-        let donation;
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
-            .then(res => donation = res.body )
-            .then(()=>{
+            .then(({ body: donation }) => donation )
+            .then( donation =>{
                 return request.get(`/api/donations/${donation._id}`)
                     .set('Authorization', token)
-                    .then(res =>{
-                        assert.deepEqual(res.body, donation);
+                    .then(({ body: gotDonation}) =>{
+                        assert.deepEqual(gotDonation, donation);
                     });
             });
     });
 
     it('Should update a donation by id', () => {
-        const badDonation = testDonations[1];
-        let savedDonation = null; 
         return request.post('/api/donations')
             .set('Authorization', token)
-            .send(badDonation)
-            .then(({ body }) => savedDonation = body)
-            .then(() => {
-                badDonation.quantity = '11';
+            .send(testDonations[0])
+            .then(({ body: savedDonation }) => savedDonation)
+            .then(savedDonation => {
                 return request.put(`/api/donations/${savedDonation._id}`)
                     .set('Authorization', token)
-                    .send(badDonation);
+                    .send(testDonations[1]);
             })
-            .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
+            .then(({ body: updatedDonation }) => {
+                assert.deepEqual(updatedDonation.quantity, testDonations[1].quantity);
+                assert.deepEqual(updatedDonation.dropSite, testDonations[1].dropSite);
+                assert.deepEqual(updatedDonation.Donor, testDonations[1].Donor);
+            });
     });
 
     it('Should delete a donation', () => {
-        mongoose.connection.dropDatabase();
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
-            .then(({ body }) => {
-                const savedDonation = body;
+            .then(({ body: savedDonation }) => {
                 return request.delete(`/api/donations/${savedDonation._id}`)
                     .set('Authorization', token);
-                
             })
-            .then( ({ body }) => {
-                assert.deepEqual(body, { removed: true });
+            .then(({ body: removeResponse}) => {
+                assert.deepEqual(removeResponse, { removed: true });
                 return request.get('/api/donations')
                     .set('Authorization', token)
-                    .then( ({ body }) => {
-                        assert.deepEqual(body, []);
+                    .then( ({ body: gotDonations }) => {
+                        assert.deepEqual(gotDonations, []);
                     });
             });
     });

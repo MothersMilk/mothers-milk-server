@@ -2,6 +2,8 @@ const assert = require('chai').assert;
 const Donation = require('../../lib/models/donation');
 const request = require('../e2e/request');
 const mongoose = require('mongoose');
+const User = require('../../lib/models/user');
+const tokenService = require('../../lib/utils/token-service');
 
 describe('Donation model', () =>  {
 
@@ -18,14 +20,17 @@ describe('Donation model', () =>  {
     beforeEach(() => mongoose.connection.dropDatabase());
     let token = '';
     beforeEach(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
+        const user = new User({
+            email: 'teststaff@test.com',
+            name: 'Test staff',
+            roles: ['admin']
+        });
+        user.generateHash('password');
+        return user.save()
+            .then(user => {
+                return tokenService.sign(user);
             })
-            .then(({ body }) => token = body.token)
+            .then(signed => token = signed )
             .then(() => {
                 return request.post('/api/dropSites')
                     .set('Authorization', token)
@@ -36,12 +41,14 @@ describe('Donation model', () =>  {
 
     beforeEach(() => {
         return request.post('/api/users')
+            .set('Authorization', token)
             .send({
                 email: 'test2@gmail.com',
                 name: 'Mich',
+                password: 'password',
                 hash: '235'
             })
-            .then(({ body }) => savedDonor = body);
+            .then(({ body }) => savedDonor = body.newUser);
     });
 
     it('Should validate a good model', () => {
@@ -51,6 +58,7 @@ describe('Donation model', () =>  {
             dropSite: savedDropSite._id,
             Donor: savedDonor._id
         });
+        
         assert.equal(donation.validateSync(), undefined);
     });
 

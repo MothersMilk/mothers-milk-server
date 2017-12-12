@@ -2,22 +2,14 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
+const adminToken = require('./adminToken');
 
 
 describe('dropSite API', () => {
-    beforeEach(() => mongoose.connection.dropDatabase());
 
     let token = '';
-    beforeEach(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
-            })
-            .then(({ body }) => token = body.token);
-    });
+    beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
 
     const testDropSites = [
         {
@@ -41,8 +33,7 @@ describe('dropSite API', () => {
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
-            .then(({ body }) => {
-                const savedDropSite = body;
+            .then(({ body: savedDropSite }) => {
                 assert.ok(savedDropSite._id);
                 assert.equal(savedDropSite.name, testDropSites[1].name);
                 assert.equal(savedDropSite.address, testDropSites[1].address);
@@ -55,15 +46,15 @@ describe('dropSite API', () => {
             return request.post('/api/dropSites')
                 .set('Authorization', token)
                 .send(dropSite)
-                .then(({ body }) => body );
+                .then(({ body: savedDropSite }) => savedDropSite );
         });
 
         return Promise.all(saveDropSites)
             .then(savedDropSites => {
                 return request.get('/api/dropSites')
                     .set('Authorization', token)
-                    .then(({ body }) => {
-                        const gotDropSites = body.sort((a, b) => a._id < b._id);
+                    .then(({ body: gotDropSites }) => {
+                        gotDropSites = gotDropSites.sort((a, b) => a._id < b._id);
                         savedDropSites = savedDropSites.sort((a, b) => a._id < b._id);
                         assert.deepEqual(savedDropSites, gotDropSites);
                     });
@@ -74,49 +65,49 @@ describe('dropSite API', () => {
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
-            .then(({ body }) => {
-                const savedDropSite = body;
+            .then(({ body: savedDropSite }) => {
                 return request.delete(`/api/dropSites/${savedDropSite._id}`)
                     .set('Authorization', token);
             })
-            .then( ({ body }) => {
-                assert.deepEqual(body, { removed: true });
+            .then( ({ body: deleteResponse }) => {
+                assert.deepEqual(deleteResponse, { removed: true });
                 return request.get('/api/dropSites')
                     .set('Authorization', token)
-                    .then( ({ body })=>{
-                        assert.deepEqual(body, []);
+                    .then( ({ body: gotDropSites })=>{
+                        assert.deepEqual(gotDropSites, []);
                     });
             });
     });
 
     it('Should get a dropSite by id', ()=>{
-        let dropSite;
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
-            .then(res => dropSite = res.body )
-            .then(()=>{
-                return request.get(`/api/dropSites/${dropSite._id}`)
+            .then(({ body: savedDropSite }) => savedDropSite)
+            .then( savedDropSite => {
+                return request.get(`/api/dropSites/${savedDropSite._id}`)
                     .set('Authorization', token)
-                    .then(res =>{
-                        assert.deepEqual(res.body, dropSite);
+                    .then(({ body: gotDropSite }) =>{
+                        assert.deepEqual(gotDropSite, savedDropSite);
                     });
             });
     });
 
-    it('Should update a dropSite by id', () => {
-        const badDropSite = testDropSites[1];
-        let savedDropSite = null; 
+    it('Should update a dropSite by id', () => { 
         return request.post('/api/dropSites')
             .set('Authorization', token)
-            .send(badDropSite)
-            .then(({ body }) => savedDropSite = body)
-            .then(() => {
-                badDropSite.address = 'New address';
+            .send(testDropSites[0])
+            .then(({ body: savedDropSite }) => savedDropSite)
+            .then(savedDropSite => {
                 return request.put(`/api/dropSites/${savedDropSite._id}`)
                     .set('Authorization', token)
-                    .send(badDropSite);
+                    .send(testDropSites[1]);
             })
-            .then(({ body }) => assert.deepEqual(body.nModified === 1, true));
+            .then(({ body }) => {
+                assert.deepEqual(body.name, testDropSites[1].name);
+                assert.deepEqual(body.hours, testDropSites[1].hours);
+                assert.deepEqual(body.address, testDropSites[1].address);
+                
+            });
     });
 });
