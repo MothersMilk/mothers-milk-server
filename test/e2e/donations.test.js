@@ -111,22 +111,19 @@ describe.only('donation API', () => {
     });
 
     it('Should delete a donation', () => {
-        mongoose.connection.dropDatabase();
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
-            .then(({ body }) => {
-                const savedDonation = body;
+            .then(({ body: savedDonation }) => {
                 return request.delete(`/api/donations/${savedDonation._id}`)
                     .set('Authorization', token);
-                
             })
-            .then( ({ body }) => {
-                assert.deepEqual(body, { removed: true });
+            .then(({ body: removeResponse}) => {
+                assert.deepEqual(removeResponse, { removed: true });
                 return request.get('/api/donations')
                     .set('Authorization', token)
-                    .then( ({ body }) => {
-                        assert.deepEqual(body, []);
+                    .then( ({ body: gotDonations }) => {
+                        assert.deepEqual(gotDonations, []);
                     });
             });
     });
