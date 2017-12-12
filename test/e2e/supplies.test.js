@@ -1,6 +1,8 @@
 const request = require('./request');
 const mongoose = require('mongoose');
 const assert = require('chai').assert;
+const User = require('../../lib/models/user');
+const tokenService = require('../../lib/utils/token-service');
 
 describe('supplies API', () => {
 
@@ -17,37 +19,45 @@ describe('supplies API', () => {
         fulfilled: false
     };
     beforeEach(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
+        const user = new User({
+            email: 'teststaff@test.com',
+            name: 'Test staff',
+            roles: ['admin']
+        });
+        user.generateHash('password');
+        return user.save()
+            .then(user => {
+                console.log('user', user);
+                return tokenService.sign(user);
             })
-            .then(({ body }) => token = body.token);
+            .then(signed => token = signed );
     });
 
     beforeEach(() => {
         return request.post('/api/users')
+            .set('Authorization', token)
             .send({
                 email: 'test@gmail.com',
                 name: 'Michele',
+                password: 'password',
                 hash: '234'
             })
             .then(({ body }) => {
-                supplyTwo.Donor = body._id;
+                supplyTwo.Donor = body.newUser._id;
             });
     });
 
     beforeEach(() => {
         return request.post('/api/users')
+            .set('Authorization', token)
             .send({
                 email: 'test2@gmail.com',
                 name: 'Mich',
+                password: 'password',
                 hash: '235'
             })
             .then(({ body }) => {
-                suppliesTest.Donor = body._id;
+                suppliesTest.Donor = body.newUser._id;
             });
     });
 
