@@ -5,8 +5,30 @@ const adminToken = require('./adminToken');
 
 describe.only('supplies API', () => {
 
-    beforeEach(() => mongoose.connection.dropDatabase());
     let token = '';
+    beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
+
+    const testData = [
+        {
+            email: 'testDonor@gmail.com',
+            name: 'Test DOnor',
+            password: 'password',
+            hash: '234',
+            roles: ['donor']
+        },
+        {
+            bags: 9,
+            boxes: 2,
+            fulfilled: false
+        },
+        {
+            bags: 1,
+            boxes: 3,
+            fulfilled: false
+        }
+    ];
+
     const suppliesTest = {
         bags: 9,
         boxes: 2,
@@ -17,49 +39,31 @@ describe.only('supplies API', () => {
         boxes: 3,
         fulfilled: false
     };
-    beforeEach(async() => token = await adminToken());
 
     beforeEach(() => {
         return request.post('/api/users')
             .set('Authorization', token)
-            .send({
-                email: 'test@gmail.com',
-                name: 'Michele',
-                password: 'password',
-                hash: '234'
-            })
+            .send(testData[0])
             .then(({ body }) => {
+                testData[1].Donor = body.newUser._id;
+                testData[2].Donor = body.newUser._id;
+                //remove
                 supplyTwo.Donor = body.newUser._id;
-            });
-    });
-
-    beforeEach(() => {
-        return request.post('/api/users')
-            .set('Authorization', token)
-            .send({
-                email: 'test2@gmail.com',
-                name: 'Mich',
-                password: 'password',
-                hash: '235'
-            })
-            .then(({ body }) => {
                 suppliesTest.Donor = body.newUser._id;
             });
     });
 
     
 
-    it('saves with id', () => {
-        
+    it('Shoud save a supply with id', () => {
         return request.post('/api/supplies')
             .set('Authorization', token)
-            .send(suppliesTest)
-            .then(res => {
-                const supplies = res.body;
-                assert.ok(supplies._id);
-                assert.equal(supplies.bags, suppliesTest.bags);
-                assert.equal(supplies.boxes, suppliesTest.boxes);
-                assert.equal(supplies.Donor, suppliesTest.Donor);
+            .send(testData[1])
+            .then(({ body }) => {
+                assert.ok(body._id);
+                assert.equal(body.bags, testData[1].bags);
+                assert.equal(body.boxes, testData[1].boxes);
+                assert.equal(body.Donor, testData[1].Donor);
             });
     });
 
