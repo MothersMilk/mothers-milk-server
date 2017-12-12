@@ -7,7 +7,7 @@ const adminToken = require('./adminToken');
 describe.only('donation API', () => {
 
     let token = '';
-    const testDonations = [];
+    let testDonations = [];
     beforeEach(() => mongoose.connection.dropDatabase());
     beforeEach(async() => token = await adminToken());
 
@@ -23,6 +23,7 @@ describe.only('donation API', () => {
             .send(testDropSite)
             .then(({ body: savedDropSite }) => savedDropSite )
             .then(savedDropSite => {
+                testDonations = [];
                 testDonations.push({quantity: 6, date: '2017-01-01', dropSite: savedDropSite._id});
                 testDonations.push({quantity: 9, date: '2017-02-01', dropSite: savedDropSite._id});
                 testDonations.push({quantity: 3, date: '2017-03-01', dropSite: savedDropSite._id});
@@ -79,17 +80,15 @@ describe.only('donation API', () => {
     });
 
     it('Should get a donation by id', ()=>{
-        mongoose.connection.dropDatabase();
-        let donation;
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
-            .then(res => donation = res.body )
-            .then(()=>{
+            .then(({ body: donation }) => donation )
+            .then( donation =>{
                 return request.get(`/api/donations/${donation._id}`)
                     .set('Authorization', token)
-                    .then(res =>{
-                        assert.deepEqual(res.body, donation);
+                    .then(({ body: gotDonation}) =>{
+                        assert.deepEqual(gotDonation, donation);
                     });
             });
     });
