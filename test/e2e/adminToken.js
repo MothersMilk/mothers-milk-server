@@ -9,12 +9,12 @@ const user = new User({
 });
 user.generateHash('password');
 
-const administratorToken = () => {
+const adminToken = () => {
     return user.save()
         .then(user => {
             return tokenService.sign(user);
         })
-        .then(adminToken => adminToken );
+        .then(token => token );
 };
 
-module.exports = administratorToken;
+module.exports = adminToken;

@@ -2,42 +2,42 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
-const adminToken = require('./testAdmin');
-// const User = require('../../lib/models/user');
-// const tokenService = require('../../lib/utils/token-service');
+const adminToken = require('./adminToken');
+
 
 describe.only('user API', () => {
 
-    beforeEach(() => mongoose.connection.dropDatabase());
-
-    const testUser = {
-        name: 'Michele',
-        hash: '123',
-        email: '123@123.com',
-        roles: ['admin'],
-        password: '2'
-    };
-    const testUser2 = {
-        name: 'Michele',
-        hash: '123',
-        email: '111@222.com',
-        roles: ['admin'],
-        password: '2'
-    };
     let token = '';
+    beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
 
-    beforeEach(async() => {
-        token = await adminToken();
-    });
+    const testUsers = [
+        {
+            name: 'Michele',
+            hash: '12356',
+            email: 'Michele@test.com',
+            roles: ['admin'],
+            password: 'Michele-Password'
+        },
+        {
+            name: 'Shane',
+            hash: 'abcdefg',
+            email: 'Shane@test.com',
+            roles: ['admin'],
+            password: 'Shane-password'
+        }
+
+    ];
+    
 
     it('saves with id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser2)
+            .send(testUsers[1])
             .then(res => {
                 const user = res.body.newUser;
                 assert.ok(user._id);
-                assert.equal(user.name, testUser.name);
+                assert.equal(user.name, testUsers[1].name);
             });
     });
 
@@ -45,7 +45,7 @@ describe.only('user API', () => {
         let user = null;
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser2)
+            .send(testUsers[1])
             .then(res => {
                 user = res.body.newUser;
                 return request.delete(`/api/users/${user._id}`)
@@ -68,7 +68,7 @@ describe.only('user API', () => {
         let user = null;
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser2)
+            .send(testUsers[1])
             .then(res => {
                 user = res.body.newUser;
                 return request.get(`/api/users/${user._id}`)
@@ -80,15 +80,8 @@ describe.only('user API', () => {
     });
 
     it('gets all user', () => {
-        const otheruser = {
-            name: 'Not Michele',
-            hash: '123',
-            email: '1222223@123.com',
-            roles: ['admin'],
-            password: '2'
-        };
         
-        const posts = [testUser2, otheruser].map(user => {
+        const posts = testUsers.map(user => {
             return request.post('/api/users')
                 .set('Authorization', token)
                 .send(user)
@@ -116,7 +109,7 @@ describe.only('user API', () => {
         let notAdminToken;
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser)
+            .send(testUsers[0])
             .then(({ body })=> notAdminToken = body.token)
             .then(()=>{
                 return request.put('/api/users/me')
@@ -124,8 +117,8 @@ describe.only('user API', () => {
                     .send(changeuser)
                     .then(({ body }) => {
                         assert.equal(body.name, 'updatedName');
-                        assert.deepEqual(body.roles, testUser.roles);
-                        assert.equal(body.email, testUser.email);
+                        assert.deepEqual(body.roles, testUsers[0].roles);
+                        assert.equal(body.email, testUsers[0].email);
                     });
             });
     });
@@ -140,7 +133,7 @@ describe.only('user API', () => {
 
         return request.post('/api/users')
             .set('Authorization', token)
-            .send(testUser2)
+            .send(testUsers[1])
             .then(({ body }) => saveduser = body.newUser)
             .then(() => {
                 return request.put(`/api/users/${saveduser._id}`)
