@@ -67,7 +67,7 @@ describe.only('supplies API', () => {
             });
     });
 
-    it('deletes with id', () => {
+    it('Should delete a spply with id', () => {
         return request.post('/api/supplies')
             .send(testData[1])
             .then(({ body: supply }) => {
@@ -85,16 +85,14 @@ describe.only('supplies API', () => {
             });
     });
 
-    it('gets by id', () => {
-        let supply = null;
+    it('Should get a supply by id', () => {
         return request.post('/api/supplies')
-            .send(suppliesTest)
-            .then(res => {
-                supply = res.body;
-                return request.get(`/api/supplies/${supply._id}`);
-            })
-            .then(res => {
-                assert.deepEqual(res.body, supply);
+            .send(testData[1])
+            .then(({ body: supply }) => {
+                return request.get(`/api/supplies/${supply._id}`)
+                    .then(({ body: gotSupply}) => {
+                        assert.deepEqual(gotSupply, supply);
+                    });
             });
     });
 
