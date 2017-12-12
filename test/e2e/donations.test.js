@@ -2,19 +2,25 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
+const User = require('../../lib/models/user');
+const tokenService = require('../../lib/utils/token-service');
 
 describe('donation API', () => {
     before(() => mongoose.connection.dropDatabase());
     let token = '';
     before(() => {
-        return request
-            .post('/api/auth/signup')
-            .send({
-                email: 'teststaff@test.com',
-                name: 'Test staff',
-                password: 'password' 
+        const user = new User({
+            email: 'teststaff@test.com',
+            name: 'Test staff',
+            roles: ['admin']
+        });
+        user.generateHash('password');
+        return user.save()
+            .then(user => {
+                console.log('user', user);
+                return tokenService.sign(user);
             })
-            .then(({ body }) => token = body.token);
+            .then(signed => token = signed );
     });
 
     let savedDropSite = null;
@@ -41,16 +47,19 @@ describe('donation API', () => {
     });
 
     before(() => {
+        console.log('got to third before each');
         return request.post('/api/users')
+            .set('Authorization', token)
             .send({
                 email: 'test2@gmail.com',
                 name: 'Mich',
+                password: 'password',
                 hash: '235'
             })
             .then(({ body }) => {
-                testDonations[0].Donor = body._id;
-                testDonations[1].Donor = body._id;
-                testDonations[2].Donor = body._id;
+                testDonations[0].Donor = body.newUser._id;
+                testDonations[1].Donor = body.newUser._id;
+                testDonations[2].Donor = body.newUser._id;
             });
     });
 
@@ -62,7 +71,6 @@ describe('donation API', () => {
                 const savedDonation = body;
                 assert.ok(savedDonation._id);
                 assert.equal(savedDonation.quantity, testDonations[1].quantity);
-                // assert.equal(savedDonation.date, testDonations[1].date);
                 assert.ok(savedDonation.date);
                 assert.equal(savedDonation.dropSite, testDonations[1].dropSite);
             });

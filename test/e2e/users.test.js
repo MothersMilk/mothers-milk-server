@@ -2,6 +2,7 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
+const User = require('../../lib/models/user');
 
 describe('user API', () => {
 
@@ -117,15 +118,12 @@ describe('user API', () => {
             name: 'updatedName',
             roles: ['updated roles']
         };
-        
-       
         return request.put('/api/users/me')
             .set('Authorization', token)
             .send(changeuser)
             .then(({ body }) => {
                 assert.equal(body.name, 'updatedName');
                 assert.deepEqual(body.roles, testUser.roles);
-                assert.notEqual(body.hash, testUser.hash);
                 assert.equal(body.email, testUser.email);
             });
     });
