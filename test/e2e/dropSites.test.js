@@ -5,7 +5,7 @@ const assert = chai.assert;
 const adminToken = require('./adminToken');
 
 
-describe.only('dropSite API', () => {
+describe('dropSite API', () => {
 
     let token = '';
     beforeEach(() => mongoose.connection.dropDatabase());

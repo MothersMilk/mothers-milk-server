@@ -2,25 +2,13 @@ const chai = require('chai');
 const mongoose = require('mongoose');
 const request = require('./request');
 const assert = chai.assert;
-const User = require('../../lib/models/user');
-const tokenService = require('../../lib/utils/token-service');
+const adminToken = require('./adminToken');
 
 describe('donation API', () => {
-    before(() => mongoose.connection.dropDatabase());
+    
     let token = '';
-    before(() => {
-        const user = new User({
-            email: 'teststaff@test.com',
-            name: 'Test staff',
-            roles: ['admin']
-        });
-        user.generateHash('password');
-        return user.save()
-            .then(user => {
-                return tokenService.sign(user);
-            })
-            .then(signed => token = signed );
-    });
+    beforeEach(() => mongoose.connection.dropDatabase());
+    beforeEach(async() => token = await adminToken());
 
     let savedDropSite = null;
     const testDonations = [];
