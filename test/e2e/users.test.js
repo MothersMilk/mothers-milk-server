@@ -82,7 +82,7 @@ describe.only('user API', () => {
             return request.post('/api/users')
                 .set('Authorization', token)
                 .send(user)
-                .then(res => res.body);
+                .then(({ body }) => body);
         });
         return Promise.all(saveUsers)
             .then(savedUsers => {
@@ -94,23 +94,17 @@ describe.only('user API', () => {
             });
     });
 
-    it('Should only update name field with non admin token', () => {
-        let changeuser = {
-            email: 'updatedEmail',
-            name: 'updatedName',
-            roles: ['updated roles']
-        };
-        let notAdminToken;
+    it('Should only update name field with without admin token', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[0])
-            .then(({ body })=> notAdminToken = body.token)
-            .then(()=>{
+            .then(({ body })=> body.token)
+            .then( userToken =>{
                 return request.put('/api/users/me')
-                    .set('Authorization', notAdminToken)
-                    .send(changeuser)
+                    .set('Authorization', userToken)
+                    .send(testUsers[1])
                     .then(({ body }) => {
-                        assert.equal(body.name, 'updatedName');
+                        assert.equal(body.name, testUsers[1].name);
                         assert.deepEqual(body.roles, testUsers[0].roles);
                         assert.equal(body.email, testUsers[0].email);
                     });
