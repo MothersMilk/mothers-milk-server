@@ -115,19 +115,19 @@ describe('user API', () => {
         let changeuser = {
             email: 'updatedEmail',
             name: 'updatedName',
-            hash: 'updatedhash',
             roles: ['updated roles']
         };
         
-        return request.post('/api/users')
+       
+        return request.put('/api/users/me')
             .set('Authorization', token)
-            .send(testUser2)
-            .then(() => {
-                return request.put('/api/users/me')
-                    .set('Authorization', token)
-                    .send(changeuser);
-            })
-            .then(({ body }) => assert.deepEqual(body.name, 'Michelle'));
+            .send(changeuser)
+            .then(({ body }) => {
+                assert.equal(body.name, 'updatedName');
+                assert.deepEqual(body.roles, testUser.roles);
+                assert.notEqual(body.hash, testUser.hash);
+                assert.equal(body.email, testUser.email);
+            });
     });
     
 
