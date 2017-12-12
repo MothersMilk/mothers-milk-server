@@ -30,14 +30,14 @@ describe.only('user API', () => {
     ];
     
 
-    it('saves with id', () => {
+    it('Should save a user with id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[1])
-            .then(res => {
-                const user = res.body.newUser;
-                assert.ok(user._id);
-                assert.equal(user.name, testUsers[1].name);
+            .then(({ body }) => {
+                const savedUser = body.newUser;
+                assert.ok(savedUser._id);
+                assert.equal(savedUser.name, testUsers[1].name);
             });
     });
 
