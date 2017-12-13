@@ -85,11 +85,27 @@ describe('donation API', () => {
             .set('Authorization', token)
             .send(testDonations[1])
             .then(({ body: donation }) => donation )
-            .then( donation =>{
+            .then( donation => {
                 return request.get(`/api/donations/${donation._id}`)
                     .set('Authorization', token)
                     .then(({ body: gotDonation}) =>{
                         assert.deepEqual(gotDonation, donation);
+                    });
+            });
+    });
+
+    it.only('Should get all donations by donor id', () => {
+        let _donation = '';
+        return request.post('/api/donations')
+            .set('Authorization', token)
+            .send(testDonations[1])
+            .then(({ body: donation }) => donation )
+            .then( donation => {
+                _donation = donation;
+                return request.get(`/api/donations/${testDonations[1].Donor}`)
+                    .set('Authorization', token)
+                    .then(({ body: allDonations }) => {
+                        assert.deepEqual(allDonations, [_donation]);
                     });
             });
     });
