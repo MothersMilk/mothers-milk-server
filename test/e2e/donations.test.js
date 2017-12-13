@@ -35,16 +35,17 @@ describe('donation API', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send({
-                email: 'testDOnor@gmail.com',
-                name: 'Test DOnor',
+                email: 'testDonor@gmail.com',
+                name: 'Test Donor',
                 password: 'password',
+                address: '222 test dr., Portland, OR 97229',
                 hash: '235',
                 roles: ['donor']
             })
             .then(({ body }) => {
-                testDonations[0].Donor = body.newUser._id;
-                testDonations[1].Donor = body.newUser._id;
-                testDonations[2].Donor = body.newUser._id;
+                testDonations[0].donor = body.newUser._id;
+                testDonations[1].donor = body.newUser._id;
+                testDonations[2].donor = body.newUser._id;
             });
     });
 
@@ -80,16 +81,58 @@ describe('donation API', () => {
             });   
     });
 
-    it('Should get a donation by id', ()=>{
+    it('Should get a donation by id', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
             .then(({ body: donation }) => donation )
-            .then( donation =>{
+            .then( donation => {
                 return request.get(`/api/donations/${donation._id}`)
                     .set('Authorization', token)
                     .then(({ body: gotDonation}) =>{
                         assert.deepEqual(gotDonation, donation);
+                    });
+            });
+    });
+
+    it('Should get all donations by donor id', () => {
+        let _donation = '';
+        return request.post('/api/donations')
+            .set('Authorization', token)
+            .send(testDonations[1])
+            .then(({ body: donation }) => donation )
+            .then( donation => {
+                _donation = donation;
+                return request.get(`/api/donations/donor/${donation.donor}`)
+                    .set('Authorization', token)
+                    .then(({ body: allDonations }) => {
+                        assert.deepEqual(allDonations, [_donation]);
+                    });
+            });
+    });
+
+    it('Should get all donations by donor id using a me route', () => {
+        let _donation = '';
+        let donorToken = '';
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then( ({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then( ({ body }) => {
+                _donation = body;
+                return request.get('/api/donations/donor/me')
+                    .set('Authorization', donorToken)
+                    .then(({ body: allDonations }) => {
+                        assert.deepEqual(allDonations, [_donation]);
                     });
             });
     });
@@ -107,7 +150,7 @@ describe('donation API', () => {
             .then(({ body: updatedDonation }) => {
                 assert.deepEqual(updatedDonation.quantity, testDonations[1].quantity);
                 assert.deepEqual(updatedDonation.dropSite, testDonations[1].dropSite);
-                assert.deepEqual(updatedDonation.Donor, testDonations[1].Donor);
+                assert.deepEqual(updatedDonation.donor, testDonations[1].donor);
             });
     });
 

@@ -14,6 +14,7 @@ describe('Auth API', () => {
         const user = new User({
             email: 'teststaff@test.com',
             name: 'Test staff',
+            address: '222 web site, Portland, OR 97229',
             roles: ['admin']
         });
         user.generateHash('password');

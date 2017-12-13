@@ -16,6 +16,7 @@ describe('users API', () => {
             name: 'Michele',
             hash: '12356',
             email: 'Michele@test.com',
+            address: '222 test dr., Portland, OR 97229',
             roles: ['admin'],
             password: 'Michele-Password'
         },
@@ -23,6 +24,7 @@ describe('users API', () => {
             name: 'Shane',
             hash: 'abcdefg',
             email: 'Shane@test.com',
+            address: '225 test dr., Portland, OR 97229',
             roles: ['admin'],
             password: 'Shane-password'
         }

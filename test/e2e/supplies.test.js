@@ -12,8 +12,9 @@ describe('supplies API', () => {
     const testData = [
         {
             email: 'testDonor@gmail.com',
-            name: 'Test DOnor',
+            name: 'Test Donor',
             password: 'password',
+            address: '222 test dr., Portland, OR 97229',
             hash: '234',
             roles: ['donor']
         },
@@ -36,14 +37,14 @@ describe('supplies API', () => {
             .set('Authorization', token)
             .send(testData[0])
             .then(({ body }) => {
-                testData[1].Donor = body.newUser._id;
-                testData[2].Donor = body.newUser._id;  
+                testData[1].donor = body.newUser._id;
+                testData[2].donor = body.newUser._id;  
             });
     });
 
     
 
-    it('Shoud save a supply with id', () => {
+    it('Should save a supply with id', () => {
         return request.post('/api/supplies')
             .set('Authorization', token)
             .send(testData[1])
@@ -51,7 +52,7 @@ describe('supplies API', () => {
                 assert.ok(body._id);
                 assert.equal(body.bags, testData[1].bags);
                 assert.equal(body.boxes, testData[1].boxes);
-                assert.equal(body.Donor, testData[1].Donor);
+                assert.equal(body.donor, testData[1].donor);
             });
     });
 
@@ -60,8 +61,8 @@ describe('supplies API', () => {
             .send(testData[1])
             .then(({ body: supply }) => {
                 return request.delete(`/api/supplies/${supply._id}`)
-                    .then(({ body: response }) => {
-                        assert.deepEqual(response, { removed: true });
+                    .then(({ body: res }) => {
+                        assert.deepEqual(res, { removed: true });
                         return request.get(`/api/supplies/${supply._id}`);
                     })
                     .then(
