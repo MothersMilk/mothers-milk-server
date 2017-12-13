@@ -110,7 +110,7 @@ describe('donation API', () => {
             });
     });
 
-    it.only('Should get all donations by donor id using a me route', () => {
+    it('Should get all donations by donor id using a me route', () => {
         let _donation = '';
         let donorToken = '';
 
