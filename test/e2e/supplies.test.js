@@ -61,8 +61,8 @@ describe('supplies API', () => {
             .send(testData[1])
             .then(({ body: supply }) => {
                 return request.delete(`/api/supplies/${supply._id}`)
-                    .then(({ body: response }) => {
-                        assert.deepEqual(response, { removed: true });
+                    .then(({ body: res }) => {
+                        assert.deepEqual(res, { removed: true });
                         return request.get(`/api/supplies/${supply._id}`);
                     })
                     .then(
