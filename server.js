@@ -7,7 +7,7 @@ const adminToken = require('./test/e2e/adminToken');
 connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mothersmilk');
 
 const server = http.createServer(app);
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 
 
 adminToken();
