@@ -80,7 +80,7 @@ describe('donation API', () => {
             });   
     });
 
-    it('Should get a donation by id', ()=>{
+    it('Should get a donation by id', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
@@ -102,6 +102,26 @@ describe('donation API', () => {
             .then(({ body: donation }) => donation )
             .then( donation => {
                 _donation = donation;
+                return request.get(`/api/donations/donor/${donation.Donor}`)
+                    .set('Authorization', token)
+                    .then(({ body: allDonations }) => {
+                        assert.deepEqual(allDonations, [_donation]);
+                    });
+            });
+    });
+
+    it.only('Should get all donations by donor id using a me route', () => {
+        let _donation = '';
+        return request.post('/api/donations')
+            .set('Authorization', token)
+            .send(testDonations[1])
+            .then(({ body: donation }) => {
+                _donation = donation;
+                return request.put(`/api/users/${donation.Donor}`)
+                    .set('Authorization', token)
+                    .send({ roles: ['Donor']});             
+            })
+            .then(() => {
                 return request.get('/api/donations/donor/me')
                     .set('Authorization', token)
                     .then(({ body: allDonations }) => {
