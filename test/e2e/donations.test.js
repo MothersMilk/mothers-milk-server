@@ -110,20 +110,26 @@ describe('donation API', () => {
             });
     });
 
-    it('Should get all donations by donor id using a me route', () => {
+    it.only('Should get all donations by donor id using a me route', () => {
         let _donation = '';
-        return request.post('/api/donations')
-            .set('Authorization', token)
-            .send(testDonations[1])
-            .then(({ body: donation }) => {
-                _donation = donation;
-                return request.put(`/api/users/${donation.donor}`)
-                    .set('Authorization', token)
-                    .send({ roles: ['donor']});             
+        let donorToken = '';
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
             })
-            .then(() => {
+            .then( ({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then( ({ body }) => {
+                _donation = body;
                 return request.get('/api/donations/donor/me')
-                    .set('Authorization', token)
+                    .set('Authorization', donorToken)
                     .then(({ body: allDonations }) => {
                         assert.deepEqual(allDonations, [_donation]);
                     });
