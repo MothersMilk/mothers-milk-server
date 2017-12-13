@@ -14,6 +14,7 @@ describe('supplies API', () => {
             email: 'testDonor@gmail.com',
             name: 'Test Donor',
             password: 'password',
+            address: '222 test dr., Portland, OR 97229',
             hash: '234',
             roles: ['donor']
         },
@@ -43,7 +44,7 @@ describe('supplies API', () => {
 
     
 
-    it('Shoud save a supply with id', () => {
+    it('Should save a supply with id', () => {
         return request.post('/api/supplies')
             .set('Authorization', token)
             .send(testData[1])

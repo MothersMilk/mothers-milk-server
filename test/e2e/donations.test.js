@@ -38,6 +38,7 @@ describe('donation API', () => {
                 email: 'testDonor@gmail.com',
                 name: 'Test Donor',
                 password: 'password',
+                address: '222 test dr., Portland, OR 97229',
                 hash: '235',
                 roles: ['donor']
             })
