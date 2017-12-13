@@ -35,16 +35,16 @@ describe('donation API', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send({
-                email: 'testDOnor@gmail.com',
-                name: 'Test DOnor',
+                email: 'testDonor@gmail.com',
+                name: 'Test Donor',
                 password: 'password',
                 hash: '235',
                 roles: ['donor']
             })
             .then(({ body }) => {
-                testDonations[0].Donor = body.newUser._id;
-                testDonations[1].Donor = body.newUser._id;
-                testDonations[2].Donor = body.newUser._id;
+                testDonations[0].donor = body.newUser._id;
+                testDonations[1].donor = body.newUser._id;
+                testDonations[2].donor = body.newUser._id;
             });
     });
 
@@ -102,7 +102,7 @@ describe('donation API', () => {
             .then(({ body: donation }) => donation )
             .then( donation => {
                 _donation = donation;
-                return request.get(`/api/donations/donor/${donation.Donor}`)
+                return request.get(`/api/donations/donor/${donation.donor}`)
                     .set('Authorization', token)
                     .then(({ body: allDonations }) => {
                         assert.deepEqual(allDonations, [_donation]);
@@ -117,9 +117,9 @@ describe('donation API', () => {
             .send(testDonations[1])
             .then(({ body: donation }) => {
                 _donation = donation;
-                return request.put(`/api/users/${donation.Donor}`)
+                return request.put(`/api/users/${donation.donor}`)
                     .set('Authorization', token)
-                    .send({ roles: ['Donor']});             
+                    .send({ roles: ['donor']});             
             })
             .then(() => {
                 return request.get('/api/donations/donor/me')
@@ -143,7 +143,7 @@ describe('donation API', () => {
             .then(({ body: updatedDonation }) => {
                 assert.deepEqual(updatedDonation.quantity, testDonations[1].quantity);
                 assert.deepEqual(updatedDonation.dropSite, testDonations[1].dropSite);
-                assert.deepEqual(updatedDonation.Donor, testDonations[1].Donor);
+                assert.deepEqual(updatedDonation.donor, testDonations[1].donor);
             });
     });
 

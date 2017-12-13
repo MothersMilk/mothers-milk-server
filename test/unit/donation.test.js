@@ -56,7 +56,7 @@ describe('Donation model', () =>  {
             quantity: 6,
             date: '1970-01-01',
             dropSite: savedDropSite._id,
-            Donor: savedDonor._id
+            donor: savedDonor._id
         });
         
         assert.equal(donation.validateSync(), undefined);

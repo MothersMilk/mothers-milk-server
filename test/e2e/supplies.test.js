@@ -12,7 +12,7 @@ describe('supplies API', () => {
     const testData = [
         {
             email: 'testDonor@gmail.com',
-            name: 'Test DOnor',
+            name: 'Test Donor',
             password: 'password',
             hash: '234',
             roles: ['donor']
@@ -36,8 +36,8 @@ describe('supplies API', () => {
             .set('Authorization', token)
             .send(testData[0])
             .then(({ body }) => {
-                testData[1].Donor = body.newUser._id;
-                testData[2].Donor = body.newUser._id;  
+                testData[1].donor = body.newUser._id;
+                testData[2].donor = body.newUser._id;  
             });
     });
 
@@ -51,7 +51,7 @@ describe('supplies API', () => {
                 assert.ok(body._id);
                 assert.equal(body.bags, testData[1].bags);
                 assert.equal(body.boxes, testData[1].boxes);
-                assert.equal(body.Donor, testData[1].Donor);
+                assert.equal(body.donor, testData[1].donor);
             });
     });
 
