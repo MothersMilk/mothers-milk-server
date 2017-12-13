@@ -76,7 +76,9 @@ describe('donation API', () => {
                     .then(({ body: gotDonations }) => {
                         gotDonations = gotDonations.sort((a, b) => a._id < b._id);
                         savedDonations = savedDonations.sort((a, b) => a._id < b._id);
-                        assert.deepEqual(savedDonations, gotDonations);
+                        savedDonations.forEach(donation => {
+                            assert.equal(donation.donor._id, gotDonations.donor);
+                        });
                     });
             });   
     });
