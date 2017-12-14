@@ -29,7 +29,7 @@ describe('dropSite API', () => {
         },
     ];
 
-    it.only('Should save a dropSite with an id', () => {
+    it('Should save a dropSite with an id', () => {
         return request.post('/api/dropSites')
             .set('Authorization', token)
             .send(testDropSites[1])
