@@ -1,6 +1,7 @@
 const { assert } = require('chai');
 const Supplies = require('../../lib/models/supply');
 
+
 describe('Supplies Model', () => {
 
     it('is a good model', () => {

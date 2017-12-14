@@ -112,4 +112,5 @@ describe('supplies API', () => {
                 assert.deepEqual(updatedSupply.fulfilled, testData[2].fulfilled);
             });
     });
+    
 });

@@ -1,6 +1,7 @@
 const assert = require('chai').assert;
 const User = require('../../lib/models/user');
 
+
 describe('User model', () => {
 
     it('Should validate a good model', () => {
