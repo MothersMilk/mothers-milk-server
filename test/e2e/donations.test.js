@@ -99,22 +99,20 @@ describe('donation API', () => {
     });
 
     it('Should get all donations by donor id', () => {
-        let _donation = '';
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
             .then(({ body: donation }) => donation )
             .then( donation => {
-                _donation = donation;
                 return request.get(`/api/donations/donor/${donation.donor}`)
                     .set('Authorization', token)
                     .then(({ body: allDonations }) => {
-                        assert.equal(allDonations[0]._id, [_donation][0]._id);
+                        assert.equal(allDonations[0]._id, [donation][0]._id);
                     });
             });
     });
 
-    it.only('Should get all donations by donor id using a me route', () => {
+    it('Should get all donations by donor id using a me route', () => {
         let _donation = '';
         let donorToken = '';
 
