@@ -93,7 +93,7 @@ describe('donation API', () => {
                 return request.get(`/api/donations/${donation._id}`)
                     .set('Authorization', token)
                     .then(({ body: gotDonation}) =>{
-                        assert.deepEqual(gotDonation, donation);
+                        assert.equal(gotDonation._id, donation._id);
                     });
             });
     });
@@ -109,7 +109,7 @@ describe('donation API', () => {
                 return request.get(`/api/donations/donor/${donation.donor}`)
                     .set('Authorization', token)
                     .then(({ body: allDonations }) => {
-                        assert.deepEqual(allDonations, [_donation]);
+                        assert.equal(allDonations[0]._id, [_donation][0]._id);
                     });
             });
     });
@@ -135,7 +135,7 @@ describe('donation API', () => {
                 return request.get('/api/donations/me')
                     .set('Authorization', donorToken)
                     .then(({ body: allDonations }) => {
-                        assert.deepEqual(allDonations, [_donation]);
+                        assert.deepEqual(allDonations[0]._id, [_donation][0]._id);
                     });
             });
     });
@@ -152,8 +152,8 @@ describe('donation API', () => {
             })
             .then(({ body: updatedDonation }) => {
                 assert.deepEqual(updatedDonation.quantity, testDonations[1].quantity);
-                assert.deepEqual(updatedDonation.dropSite, testDonations[1].dropSite);
-                assert.deepEqual(updatedDonation.donor, testDonations[1].donor);
+                assert.deepEqual(updatedDonation.dropSite._id, testDonations[1].dropSite);
+                assert.deepEqual(updatedDonation.donor._id, testDonations[1].donor);
             });
     });
 
