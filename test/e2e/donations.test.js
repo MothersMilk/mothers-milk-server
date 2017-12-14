@@ -98,7 +98,7 @@ describe('donation API', () => {
             });
     });
 
-    it.only('Should get all donations by donor id', () => {
+    it('Should get all donations by donor id', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
