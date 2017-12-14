@@ -69,11 +69,11 @@ describe('users API', () => {
             .set('Authorization', token)
             .send(testUsers[1])
             .then(({ body }) => {
-                const { newUser }= body;
+                const { newUser } = body;
                 return request.get(`/api/users/${newUser._id}`)
                     .set('Authorization', token)
                     .then(res => {
-                        assert.deepEqual(res.body, newUser);
+                        assert.equal(res.body.name, newUser.name);
                     });
             });
     });
