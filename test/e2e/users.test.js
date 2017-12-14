@@ -31,7 +31,6 @@ describe('users API', () => {
 
     ];
     
-
     it('Should save a user with id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
