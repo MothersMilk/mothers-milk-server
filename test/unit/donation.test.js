@@ -5,9 +5,9 @@ const mongoose = require('mongoose');
 const User = require('../../lib/models/user');
 const tokenService = require('../../lib/utils/token-service');
 
+
 describe('Donation model', () =>  {
 
-    //todo: save a donor before each test and add ref to test schema
     let savedDropSite = null;
     const dropSite = {
         name: 'Northwest Mothers Milk Bank',

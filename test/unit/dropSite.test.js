@@ -33,6 +33,4 @@ describe('DropSite model', () => {
         assert.equal(errors.hours.kind, 'String');
     });
 
-
-
-})
+});
