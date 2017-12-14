@@ -131,7 +131,7 @@ describe('donation API', () => {
             })
             .then( ({ body }) => {
                 _donation = body;
-                return request.get('/api/donations/donor/me')
+                return request.get('/api/donations/me')
                     .set('Authorization', donorToken)
                     .then(({ body: allDonations }) => {
                         assert.deepEqual(allDonations, [_donation]);
