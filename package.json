@@ -6,7 +6,7 @@
   "scripts": {
     "test": "npm run mocha",
     "mocha": "mocha --recursive",
-    "start": "node server.js"
+    "start": "nodemon server.js"
   },
   "repository": {
     "type": "git",
@@ -30,6 +30,8 @@
     "jsonwebtoken": "^8.1.0",
     "mongoose": "^4.13.5",
     "morgan": "^1.9.0",
-    "nodemon": "^1.12.1"
+    "nodemon": "^1.12.1",
+    "socket.io": "^2.0.4",
+    "ws": "^3.3.2"
   }
 }
