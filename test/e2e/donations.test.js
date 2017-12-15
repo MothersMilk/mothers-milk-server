@@ -179,8 +179,8 @@ describe('donation API', () => {
                     .set('Authorization', donorToken)
                     .send(testDonations[1]);
             })
-            .then(() => {
-                return request.delete('/api/donations/me')
+            .then(donation => {
+                return request.delete(`/api/donations/me/${donation._id}`)
                     .set('Authorization', donorToken)
                     .then(({ body }) => {
                         assert.equal(body, { removed: true });
