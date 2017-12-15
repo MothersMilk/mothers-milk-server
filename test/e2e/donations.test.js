@@ -164,7 +164,7 @@ describe('donation API', () => {
             });
     });
 
-    it.only('Should delete a users donation using a me route', () => {
+    it('Should delete a users donation using a me route', () => {
         let donorToken = '';
 
         return request
@@ -179,11 +179,11 @@ describe('donation API', () => {
                     .set('Authorization', donorToken)
                     .send(testDonations[1]);
             })
-            .then(donation => {
-                return request.delete(`/api/donations/me/${donation._id}`)
+            .then(({ body }) => {
+                return request.delete(`/api/donations/me/${body._id}`)
                     .set('Authorization', donorToken)
                     .then(({ body }) => {
-                        assert.equal(body, { removed: true });
+                        assert.deepEqual(body, { removed: true });
                     });
             });
     });
