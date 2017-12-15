@@ -1,7 +1,7 @@
 const http = require('http');
 const app = require('./lib/app');
 const connect = require('./lib/connect');
-const wss = require('./lib/utils/websocket');
+const wss = require('./lib/utils/io');
 
 
 const adminToken = require('./test/e2e/adminToken');
