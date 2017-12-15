@@ -164,6 +164,30 @@ describe('donation API', () => {
             });
     });
 
+    it.only('Should delete a users donation using a me route', () => {
+        let donorToken = '';
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then(() => {
+                return request.delete('/api/donations/me')
+                    .set('Authorization', donorToken)
+                    .then(({ body }) => {
+                        assert.equal(body, { removed: true });
+                    });
+            });
+    });
+
     it('Should update a donation by id', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
