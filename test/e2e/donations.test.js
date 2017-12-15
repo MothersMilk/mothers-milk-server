@@ -149,14 +149,13 @@ describe('donation API', () => {
                 email: 'testDonor@gmail.com',
                 password: 'password'
             })
-            .then( ({ body }) => {
+            .then(({ body }) => {
                 donorToken = body.token;
                 return request.post('/api/donations')
                     .set('Authorization', donorToken)
                     .send(testDonations[1]);
             })
-            .then( ({ body }) => {
-                _donation = body;
+            .then(() => {
                 return request.put('/api/donations/me')
                     .send(update)
                     .set('Authorization', donorToken)
