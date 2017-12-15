@@ -138,8 +138,7 @@ describe('donation API', () => {
             });
     });
 
-    it('Should update a users donation using a me route', () => {
-        let _donation = '';
+    it.only('Should update a users donation using a me route', () => {
         let donorToken = '';
         let update = { quantity: '999' };
 
