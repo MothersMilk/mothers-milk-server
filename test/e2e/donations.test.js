@@ -138,7 +138,7 @@ describe('donation API', () => {
             });
     });
 
-    it.only('Should update a users donation using a me route', () => {
+    it('Should update a users donation using a me route', () => {
         let donorToken = '';
         let update = { quantity: '999' };
 
@@ -159,7 +159,7 @@ describe('donation API', () => {
                     .send(update)
                     .set('Authorization', donorToken)
                     .then(({ body }) => {
-                        assert.deepEqual(body.quantity, update.quantity);
+                        assert.equal(body.quantity, update.quantity);
                     });
             });
     });
