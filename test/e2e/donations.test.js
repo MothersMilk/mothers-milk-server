@@ -138,6 +138,34 @@ describe('donation API', () => {
             });
     });
 
+    it('Should update a users donation using a me route', () => {
+        let _donation = '';
+        let donorToken = '';
+        let update = { quantity: '999' };
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then( ({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then( ({ body }) => {
+                _donation = body;
+                return request.put('/api/donations/me')
+                    .send(update)
+                    .set('Authorization', donorToken)
+                    .then(({ body }) => {
+                        assert.deepEqual(body.quantity, update.quantity);
+                    });
+            });
+    });
+
     it('Should update a donation by id', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
