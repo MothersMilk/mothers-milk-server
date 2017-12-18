@@ -4,7 +4,7 @@ const connect = require('./lib/connect');
 const io = require('./lib/utils/io');
 
 //TODO: remove
-const adminToken = require('./test/e2e/adminToken');
+// const adminToken = require('./test/e2e/adminToken');
 
 connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/mothersmilk');
 
@@ -15,7 +15,7 @@ io.init(server);
 const port = process.env.PORT || 3001;
 
 //TODO: remove
-adminToken();
+// adminToken();
 
 server.listen(port, () => {
     console.log('server running on', server.address().port);
