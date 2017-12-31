@@ -6,6 +6,7 @@ describe('User model', () => {
 
     it('Should validate a good model', () => {
         const user = new User({
+            email: 'Michele@me.com',
             name: 'Michele',
             address: '222 Apple St, Portland, OR 97225',
             hash: '123'
