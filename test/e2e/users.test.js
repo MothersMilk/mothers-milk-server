@@ -5,7 +5,7 @@ const assert = chai.assert;
 const adminToken = require('./adminToken');
 
 
-describe.skip('users API', () => {
+describe('users API', () => {
 
     let token = '';
     beforeEach(() => mongoose.connection.dropDatabase());
@@ -64,7 +64,7 @@ describe.skip('users API', () => {
             });
     });
 
-    it('Should get a user by id', () => {
+    it.only('Should get a user by id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[1])
