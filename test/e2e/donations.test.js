@@ -12,7 +12,6 @@ describe('donation API', () => {
     beforeEach(() => mongoose.connection.dropDatabase());
     beforeEach(async() => token = await adminToken());
     
-
     const testDropSite = {
         name: 'Northwest Mothers Milk Bank',
         address: '417 SW 117th Ave, Portland, OR 97225',
@@ -112,7 +111,31 @@ describe('donation API', () => {
             });
     });
 
-    
+    it('Should update a users donation using a me route', () => {
+        let donorToken = '';
+        let update = { quantity: '999' };
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then(({ body }) => {
+                return request.put(`/api/donations/me/${body._id}`)
+                    .send(update)
+                    .set('Authorization', donorToken)
+                    .then(({ body }) => {
+                        assert.equal(body.quantity, update.quantity);
+                    });
+            });
+    });
 
     it('Should delete a donation', () => {
         return request.post('/api/donations')
@@ -131,4 +154,5 @@ describe('donation API', () => {
                     });
             });
     });
+
 });
