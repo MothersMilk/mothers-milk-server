@@ -64,7 +64,7 @@ describe('users API', () => {
             });
     });
 
-    it.only('Should get a user by id', () => {
+    it('Should get a user by id', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[1])
