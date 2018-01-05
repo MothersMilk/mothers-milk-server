@@ -4,7 +4,7 @@ const assert = require('chai').assert;
 const adminToken = require('./adminToken');
 
 
-describe.only('supplies API', () => {
+describe('supplies API', () => {
 
     let token = '';
     beforeEach(() => mongoose.connection.dropDatabase());
