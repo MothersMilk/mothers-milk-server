@@ -84,7 +84,7 @@ describe('donation API', () => {
             });   
     });
 
-    it('Should get a donation by id', () => {
+    it.only('Should get a donation by id', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
