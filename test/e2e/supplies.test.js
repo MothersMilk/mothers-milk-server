@@ -121,5 +121,31 @@ describe('supplies API', () => {
                 assert.deepEqual(updatedSupply.fulfilled, testData[2].fulfilled);
             });
     });
+
+    it.only('Should update a users supply request using a me route', () => {
+        let donorToken = '';
+        let update = { bags: 9000 };
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/supplies')
+                    .set('Authorization', donorToken)
+                    .send(testData[1]);
+            })
+            .then(({ body }) => {
+                return request.put(`/api/supplies/me/${body._id}`)
+                    .send(update)
+                    .set('Authorization', donorToken)
+                    .then(({ body }) => {
+                        assert.equal(body.bags, 9000);
+                    });
+            });
+    });
     
 });
