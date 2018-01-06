@@ -111,24 +111,6 @@ describe('donation API', () => {
             });
     });
 
-    it('Should delete a donation', () => {
-        return request.post('/api/donations')
-            .set('Authorization', token)
-            .send(testDonations[1])
-            .then(({ body: savedDonation }) => {
-                return request.delete(`/api/donations/${savedDonation._id}`)
-                    .set('Authorization', token);
-            })
-            .then(({ body: removeResponse}) => {
-                assert.deepEqual(removeResponse, { removed: true });
-                return request.get('/api/donations')
-                    .set('Authorization', token)
-                    .then( ({ body: gotDonations }) => {
-                        assert.deepEqual(gotDonations, []);
-                    });
-            });
-    });
-
     it('Should get a users donations using a me route', () => {
         let donorToken = '';
 
@@ -176,6 +158,30 @@ describe('donation API', () => {
                     .set('Authorization', donorToken)
                     .then(({ body }) => {
                         assert.equal(body.quantity, update.quantity);
+                    });
+            });
+    });
+
+    it('Should delete a users donation using a me route', () => {
+        let donorToken = '';
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                donorToken = body.token;
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then(({ body }) => {
+                return request.delete(`/api/donations/me/${body._id}`)
+                    .set('Authorization', donorToken)
+                    .then(({ body }) => {
+                        assert.equal(body.removed, true);
                     });
             });
     });
