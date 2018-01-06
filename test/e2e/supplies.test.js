@@ -122,7 +122,7 @@ describe('supplies API', () => {
             });
     });
 
-    it.only('Should update a users supply request using a me route', () => {
+    it('Should update a users supply request using a me route', () => {
         let donorToken = '';
         let update = { bags: 9000 };
 
