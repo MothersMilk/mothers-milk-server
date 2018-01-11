@@ -1,5 +1,5 @@
 const User = require('../../lib/models/user');
-const tokenService = require('../../lib/utils/token-service');
+const tokenService = require('../../lib/utils/tokenService');
 
 
 const user = new User({

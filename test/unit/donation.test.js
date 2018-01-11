@@ -3,7 +3,7 @@ const Donation = require('../../lib/models/donation');
 const request = require('../e2e/request');
 const mongoose = require('mongoose');
 const User = require('../../lib/models/user');
-const tokenService = require('../../lib/utils/token-service');
+const tokenService = require('../../lib/utils/tokenService');
 
 
 describe('Donation model', () =>  {
