@@ -2,7 +2,7 @@ const request = require('./request');
 const assert = require('chai').assert;
 const mongoose = require('mongoose');
 const User = require('../../lib/models/user');
-const tokenService = require('../../lib/utils/token-service');
+const tokenService = require('../../lib/utils/tokenService');
 
 
 describe('Auth API', () => {

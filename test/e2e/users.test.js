@@ -100,7 +100,7 @@ describe('users API', () => {
             .set('Authorization', token)
             .send(testUsers[0])
             .then(({ body })=> body.token)
-            .then( userToken =>{
+            .then(userToken =>{
                 return request.put('/api/users/me')
                     .set('Authorization', userToken)
                     .send(testUsers[1])
@@ -112,13 +112,12 @@ describe('users API', () => {
             });
     });
     
-
     it('Should update all fileds of user with admin token', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[0])
             .then(({ body }) => body.newUser)
-            .then( user => {
+            .then(user => {
                 return request.put(`/api/users/${user._id}`)
                     .set('Authorization', token)
                     .send(testUsers[1]);
