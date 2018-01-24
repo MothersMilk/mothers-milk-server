@@ -129,12 +129,19 @@ describe('users API', () => {
             });
     });
     
-    it.skip('Should return an error if an Admin attempts to delete itself', () => {
+    it.only('Should return an error if an Admin attempts to delete itself', () => {
         return request.get('/api/users')
             .set('Authorization', token)
             .then(({body}) => {
-                return request.delete(`/api/users/${body[0]._id}`);
-            });
+                return request.delete(`/api/users/${body[0]._id}`)
+                    .set('Authorization', token);
+            })
+            .then(
+                () => { throw new Error('Unexpected successful response'); },
+                err => {
+                    assert.equal(err.status, 403);
+                }
+            );
         
     });
 
