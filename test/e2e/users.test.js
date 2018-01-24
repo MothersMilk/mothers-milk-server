@@ -128,4 +128,6 @@ describe('users API', () => {
                 assert.deepEqual(body.roles, testUsers[1].roles);
             });
     });
+
+
 });
