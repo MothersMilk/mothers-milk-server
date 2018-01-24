@@ -128,6 +128,14 @@ describe('users API', () => {
                 assert.deepEqual(body.roles, testUsers[1].roles);
             });
     });
-
+    
+    it.skip('Should return an error if an Admin attempts to delete itself', () => {
+        return request.get('/api/users')
+            .set('Authorization', token)
+            .then(({body}) => {
+                return request.delete(`/api/users/${body[0]._id}`);
+            });
+        
+    });
 
 });
