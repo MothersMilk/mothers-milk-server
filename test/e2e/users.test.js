@@ -8,8 +8,12 @@ const adminToken = require('./adminToken');
 describe('users API', () => {
 
     let token = '';
-    beforeEach(() => mongoose.connection.dropDatabase());
-    beforeEach(async() => token = await adminToken());
+    beforeEach(async () => {
+        console.log('about to drop database...');
+        mongoose.connection.dropDatabase();
+        console.log('database dropped');
+        token = await adminToken();
+    });
 
     const testUsers = [
         {
@@ -112,7 +116,7 @@ describe('users API', () => {
             });
     });
     
-    it('Should update all fileds of user with admin token', () => {
+    it.only('Should update all fileds of user with admin token', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[0])
