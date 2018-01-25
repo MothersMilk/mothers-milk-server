@@ -9,9 +9,7 @@ describe('users API', () => {
 
     let token = '';
     beforeEach(async () => {
-        console.log('about to drop database...');
         mongoose.connection.dropDatabase();
-        console.log('database dropped');
         token = await adminToken();
     });
 
@@ -116,7 +114,7 @@ describe('users API', () => {
             });
     });
     
-    it.only('Should update all fileds of user with admin token', () => {
+    it('Should update all fileds of user with admin token', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[0])
@@ -133,12 +131,19 @@ describe('users API', () => {
             });
     });
     
-    it.only('Should return an error if an Admin attempts to delete itself', () => {
-        return request.get('/api/users')
+    it('Should return an error if an Admin attempts to delete itself', () => {
+        let adminToken = '';
+        return request.post('/api/users')
             .set('Authorization', token)
+            .send(testUsers[0])
+            .then(({body}) => {
+                adminToken = body.token;
+                return request.get('/api/users')
+                    .set('Authorization', adminToken);
+            })
             .then(({body}) => {
                 return request.delete(`/api/users/${body[0]._id}`)
-                    .set('Authorization', token);
+                    .set('Authorization', adminToken);
             })
             .then(
                 () => { throw new Error('Unexpected successful response'); },
