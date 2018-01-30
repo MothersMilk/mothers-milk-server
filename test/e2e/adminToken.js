@@ -14,7 +14,9 @@ const adminToken = () => {
         .then(user => {
             return tokenService.sign(user);
         })
-        .then(token => token );
+        .then(token => {
+            return token;
+        });
 };
 
 module.exports = adminToken;

@@ -8,8 +8,10 @@ const adminToken = require('./adminToken');
 describe('users API', () => {
 
     let token = '';
-    beforeEach(() => mongoose.connection.dropDatabase());
-    beforeEach(async() => token = await adminToken());
+    beforeEach(async () => {
+        mongoose.connection.dropDatabase();
+        token = await adminToken();
+    });
 
     const testUsers = [
         {
@@ -128,4 +130,28 @@ describe('users API', () => {
                 assert.deepEqual(body.roles, testUsers[1].roles);
             });
     });
+    
+    it('Should return an error if an Admin attempts to delete itself', () => {
+        let adminToken = '';
+        return request.post('/api/users')
+            .set('Authorization', token)
+            .send(testUsers[0])
+            .then(({body}) => {
+                adminToken = body.token;
+                return request.get('/api/users')
+                    .set('Authorization', adminToken);
+            })
+            .then(({body}) => {
+                return request.delete(`/api/users/${body[0]._id}`)
+                    .set('Authorization', adminToken);
+            })
+            .then(
+                () => { throw new Error('Unexpected successful response'); },
+                err => {
+                    assert.equal(err.status, 403);
+                }
+            );
+        
+    });
+
 });
