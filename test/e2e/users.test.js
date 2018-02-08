@@ -97,7 +97,8 @@ describe('users API', () => {
             });
     });
 
-    it('Should only update name field with without admin token', () => {
+    // Irrelevant test since put/me is used exclusively to update a user's myDropSite value. Test can be reimplemented if route functionality changes
+    it.skip('Should only update name field with without admin token', () => {
         return request.post('/api/users')
             .set('Authorization', token)
             .send(testUsers[0])
