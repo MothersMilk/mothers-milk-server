@@ -9,9 +9,9 @@ describe('donation API', () => {
 
     let token = '';
     let testDonations = [];
-    beforeEach(() => mongoose.connection.dropDatabase());
-    beforeEach(async() => token = await adminToken());
-    
+    beforeEach(async () => await mongoose.connection.dropDatabase());
+    beforeEach(async () => token = await adminToken());
+
     const testDropSite = {
         name: 'Northwest Mothers Milk Bank',
         address: '417 SW 117th Ave, Portland, OR 97225',
@@ -40,6 +40,7 @@ describe('donation API', () => {
                 password: 'password',
                 address: '222 test dr., Portland, OR 97229',
                 hash: '235',
+                mmbId: '4321',
                 roles: ['donor']
             })
             .then(({ body }) => {
@@ -101,7 +102,9 @@ describe('donation API', () => {
         return request.post('/api/donations')
             .set('Authorization', token)
             .send(testDonations[1])
-            .then(({ body: donation }) => donation )
+            .then(({ body: donation }) => {
+                return donation;
+            })
             .then( donation => {
                 return request.get(`/api/donations/donor/${donation.donor}`)
                     .set('Authorization', token)
