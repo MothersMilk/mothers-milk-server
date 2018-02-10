@@ -8,10 +8,8 @@ const adminToken = require('./adminToken');
 describe('users API', () => {
 
     let token = '';
-    beforeEach(async () => {
-        mongoose.connection.dropDatabase();
-        token = await adminToken();
-    });
+    beforeEach(async () => await mongoose.connection.dropDatabase());
+    beforeEach(async () => token = await adminToken());
 
     const testUsers = [
         {
