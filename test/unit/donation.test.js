@@ -66,8 +66,6 @@ describe('Donation model', () =>  {
         const donation = new Donation({});
         const { errors } = donation.validateSync();
         assert.equal(errors.quantity.kind, 'required');
-        // assert.equal(errors.date.kind, 'required');
-        assert.equal(errors.dropSite.kind, 'required');
     });
 
     it('Should throw error for incorrect data types', () => {
