@@ -17,8 +17,6 @@ describe('DropSite model', () => {
         const dropSite = new DropSite({});
         const { errors } = dropSite.validateSync();
         assert.equal(errors.name.kind, 'required');
-        assert.equal(errors.address.kind, 'required');
-        assert.equal(errors.hours.kind, 'required');
     });
 
     it('Should throw error for incorrect data types', () => {

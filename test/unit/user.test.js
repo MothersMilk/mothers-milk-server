@@ -17,7 +17,6 @@ describe('User model', () => {
     it('Should throw error for missing fields', () => {
         const user = new User({});
         const { errors } = user.validateSync();
-        assert.equal(errors.name.kind, 'required');
         assert.equal(errors.hash.kind, 'required');
     });
 
