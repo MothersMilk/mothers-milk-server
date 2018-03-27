@@ -189,4 +189,31 @@ describe('donation API', () => {
             });
     });
 
+    it.only('Should return an error when deleting a processed donation', () => {
+        let donorToken = '';
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                donorToken = body.token;
+                testDonations[1].status = 'Received';
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then(({ body }) => {
+                return request.delete(`/api/donations/me/${body._id}`)
+                    .set('Authorization', donorToken)
+                    .then(
+                        () => { throw new Error('unexpected successful outcome'); },
+                        ({ response }) => {
+                            assert.equal(response.body.error, 'cannot remove processed donation');
+                        }
+                    );  
+            });
+    });
 });
