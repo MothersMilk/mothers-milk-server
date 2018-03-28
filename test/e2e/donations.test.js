@@ -188,7 +188,7 @@ describe('donation API', () => {
             );
     });
 
-    it.only('Should return an error when deleting a processed donation', () => {
+    it('Should return an error when deleting a processed donation', () => {
         let donorToken = '';
         let donationId = '';
 
@@ -200,7 +200,6 @@ describe('donation API', () => {
             })
             .then(({ body }) => {
                 donorToken = body.token;
-                testDonations[1].status = 'Received';
                 return request.post('/api/donations')
                     .set('Authorization', donorToken)
                     .send(testDonations[1]);
@@ -235,18 +234,24 @@ describe('donation API', () => {
             })
             .then(({ body }) => {
                 donorToken = body.token;
-                testDonations[1].status = 'Received';
                 return request.post('/api/donations')
                     .set('Authorization', donorToken)
                     .send(testDonations[1]);
             })
             .then(({ body }) => {
+                return request.put(`/api/donations/${body._id}`)
+                    .set('Authorization', token)
+                    .send({ status: 'Received' });
+            })
+            .then(({ body }) => {
                 return request.put(`/api/donations/me/${body._id}`)
                     .send(update)
                     .set('Authorization', donorToken)
-                    .then(({ body }) => {
-                        assert.equal(body.quantity, update.quantity);
-                    });
+                    .then(
+                        () => { throw new Error('unexpected successful outcome'); },
+                        ({ response }) => {
+                            assert.equal(response.body.error, 'cannot edit processed donation');
+                        });
             });
     });
 
