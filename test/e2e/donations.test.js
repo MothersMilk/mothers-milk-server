@@ -180,17 +180,17 @@ describe('donation API', () => {
                     .set('Authorization', donorToken)
                     .send(testDonations[1]);
             })
-            .then(({ body }) => {
-                return request.delete(`/api/donations/me/${body._id}`)
-                    .set('Authorization', donorToken)
-                    .then(({ body }) => {
-                        assert.equal(body.removed, true);
-                    });
-            });
+            .then(({ body }) => request.delete(`/api/donations/me/${body._id}`)
+                .set('Authorization', donorToken)
+                .then(({ body }) => {
+                    assert.equal(body.removed, true);
+                })
+            );
     });
 
     it.only('Should return an error when deleting a processed donation', () => {
         let donorToken = '';
+        let donationId = '';
 
         return request
             .post('/api/auth/signin')
@@ -206,6 +206,12 @@ describe('donation API', () => {
                     .send(testDonations[1]);
             })
             .then(({ body }) => {
+                donationId = body._id;
+                return request.put(`/api/donations/${donationId}`)
+                    .set('Authorization', token)
+                    .send({ status: 'Received'});
+            })
+            .then(({ body }) => {
                 return request.delete(`/api/donations/me/${body._id}`)
                     .set('Authorization', donorToken)
                     .then(
@@ -216,4 +222,32 @@ describe('donation API', () => {
                     );  
             });
     });
+
+    it('Should return error when updating processed donation', () => {
+        let donorToken = '';
+        let update = { quantity: '999' };
+
+        return request
+            .post('/api/auth/signin')
+            .send({ 
+                email: 'testDonor@gmail.com',
+                password: 'password'
+            })
+            .then(({ body }) => {
+                donorToken = body.token;
+                testDonations[1].status = 'Received';
+                return request.post('/api/donations')
+                    .set('Authorization', donorToken)
+                    .send(testDonations[1]);
+            })
+            .then(({ body }) => {
+                return request.put(`/api/donations/me/${body._id}`)
+                    .send(update)
+                    .set('Authorization', donorToken)
+                    .then(({ body }) => {
+                        assert.equal(body.quantity, update.quantity);
+                    });
+            });
+    });
+
 });
